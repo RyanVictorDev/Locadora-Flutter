@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:locadora_flutter/views/dashboard_flutter.dart';
+import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/api/api.dart';
+import 'package:locadora_flutter/src/views/publisher_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +19,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(),
+      // home: const LoginPage(),
+      home: LoginPage(),
     );
   }
 }
@@ -55,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => DashboardFlutter()),
+          MaterialPageRoute(builder: (context) => PublisherFlutter()),
         );
       }
     } catch (e) {
@@ -70,13 +72,18 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(80.0),
         child: Form(
           key: _formKey,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              Image.network(
+                'https://media.licdn.com/dms/image/v2/D4D0BAQG1TnyLjqAfng/company-logo_200_200/company-logo_200_200/0/1690218015009/altislab_logo?e=2147483647&v=beta&t=fMlpVsIBYw2LadCX6g28enRYLhhyeqt463BGJdi9eco',
+                height: 150.0
+              ),
+
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'Email'),
@@ -84,6 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Insira seu email' : null,
               ),
+
               const SizedBox(height: 16),
               TextFormField(
                 controller: _passwordController,
@@ -92,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                 validator: (value) =>
                     value?.isEmpty ?? true ? 'Insira sua senha' : null,
               ),
+
               const SizedBox(height: 24),
               if (_errorMessage != null)
                 Text(
@@ -99,6 +108,7 @@ class _LoginPageState extends State<LoginPage> {
                   style: const TextStyle(color: Colors.red),
                 ),
               const SizedBox(height: 8),
+
               ElevatedButton(
                 onPressed: _isLoading ? null : _login,
                 style: ElevatedButton.styleFrom(
@@ -109,6 +119,7 @@ class _LoginPageState extends State<LoginPage> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : const Text('Entrar'),
               ),
+
               TextButton(
                 onPressed: _isLoading ? null : () {},
                 child: const Text('Esqueci minha senha'),

@@ -9,7 +9,6 @@ class DashboardFlutter extends StatefulWidget {
 }
 
 class _DashboardFlutterState extends State<DashboardFlutter> {
-  late List<PublisherModel> _publishersFuture;
 
 Future<List<PublisherModel>> fetchPublishers() async {
     final apiService = ApiService();
