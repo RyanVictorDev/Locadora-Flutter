@@ -32,41 +32,13 @@ Future<List<PublisherModel>> fetchPublishers() async {
     return Scaffold(
       appBar: AppBar(
         leading: Icon(Icons.menu, color: Colors.white),
-        backgroundColor: const Color.fromARGB(255, 0, 83, 94),
-        title: Text('Dashboard', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
+        title: Text('Dashboard', style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: FutureBuilder<List<PublisherModel>>(
-          future: fetchPublishers(),
-          builder: (context, snapshot) {
-            print(snapshot);
-
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Erro: ${snapshot.error}'));
-
-              } else if (snapshot.hasData) {
-                final models = snapshot.data!;
-
-                return ListView.builder(
-                  itemCount: models.length,
-                  itemBuilder: (context, index) {
-                    final model = models[index];
-                    return Row(
-                      children: [
-                        Text(model.name, style: TextStyle(color: Colors.amber),),
-                        SizedBox(width:16.0),
-                        Text(model.email)
-                      ],
-                    );
-                  },
-                );
-              } else {
-                return Center(child: Text('Nenhum dado disponível.'));
-              }
-            }
+        child: Text(
+          'algo'
         ),
       ),
     );

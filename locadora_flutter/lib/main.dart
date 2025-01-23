@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/src/sidebar/sidebar_layout.dart';
 import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/api/api.dart';
 import 'package:locadora_flutter/src/views/publisher_flutter.dart';
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       // home: const LoginPage(),
-      home: LoginPage(),
+      home: SidebarLayout(),
     );
   }
 }
