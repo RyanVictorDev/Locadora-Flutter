@@ -9,8 +9,7 @@ class DashboardFlutter extends StatefulWidget {
 }
 
 class _DashboardFlutterState extends State<DashboardFlutter> {
-
-Future<List<PublisherModel>> fetchPublishers() async {
+  Future<List<PublisherModel>> fetchPublishers() async {
     final apiService = ApiService();
     final response = await apiService.fetchData('/publisher?search=');
 
@@ -31,15 +30,18 @@ Future<List<PublisherModel>> fetchPublishers() async {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.menu, color: Colors.white),
-        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
-        title: Text('Dashboard', style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0))),
-      ),
+          backgroundColor: const Color.fromARGB(0, 0, 83, 94),
+          title: Padding(
+            padding: const EdgeInsets.only(left: 30.0),
+            child: Text('Dashboard',
+                style: TextStyle(
+                    color: Colors.black, fontWeight: FontWeight.bold)
+            ),
+          )
+        ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Text(
-          'algo'
-        ),
+        child: Text('algo'),
       ),
     );
   }

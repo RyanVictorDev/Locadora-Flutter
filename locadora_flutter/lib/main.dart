@@ -20,8 +20,8 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: Colors.blue,
       ),
-      // home: const LoginPage(),
-      home: SidebarLayout(),
+      home: const LoginPage(),
+      // home: SidebarLayout(),
     );
   }
 }
@@ -58,7 +58,7 @@ class _LoginPageState extends State<LoginPage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => PublisherFlutter()),
+          MaterialPageRoute(builder: (context) => SidebarLayout()),
         );
       }
     } catch (e) {

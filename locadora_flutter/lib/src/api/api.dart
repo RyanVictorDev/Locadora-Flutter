@@ -1,11 +1,12 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:locadora_flutter/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static const String baseURL = 'https://locadora-ryan-back.altislabtech.com.br';
 
-  // Função para autenticação
   Future<void> authenticate(String username, String password) async {
     final url = Uri.parse('$baseURL/auth/login');
     final headers = {"Content-Type": "application/json"};
@@ -83,4 +84,6 @@ class ApiService {
       throw Exception('Erro na requisição GET: $e');
     }
   }
+
+
 }

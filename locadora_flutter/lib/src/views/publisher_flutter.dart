@@ -32,9 +32,14 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(Icons.menu, color: Colors.white),
-        backgroundColor: const Color.fromARGB(255, 0, 83, 94),
-        title: Text('Publisher', style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
+        title: Padding(
+          padding: const EdgeInsets.only(left: 30.0),
+          child: Text(
+          'Publisher', 
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)
+          ),
+        )
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

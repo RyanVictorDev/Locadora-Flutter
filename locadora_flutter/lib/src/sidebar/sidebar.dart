@@ -1,6 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:locadora_flutter/main.dart';
+import 'package:locadora_flutter/src/bloc.navigation_bloc/navigation_bloc.dart';
 import 'package:locadora_flutter/src/sidebar/menu_item.dart';
+import 'package:locadora_flutter/src/views/publisher_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Sidebar extends StatefulWidget {
   @override
@@ -44,6 +49,21 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
     }
   }
 
+  Future<void> logoutFunction(BuildContext context) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('authToken');
+      await prefs.remove('role');
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+      );
+    } catch (e) {
+      throw Exception('Erro ao fazer logout: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
@@ -60,68 +80,103 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
           bottom: 0,
           left: isSidebarOpened ? 0 : -screenWidth,
           right: isSidebarOpened ? 0 : screenWidth - 45,
-          child: Row( 
+          child: Row(
             children: [
               Expanded(
                 child: Container(
                   padding: EdgeInsets.symmetric(horizontal: 20),
-                  color: Color.fromARGB(255, 0, 83, 94),
+                  color: const Color.fromARGB(255, 0, 83, 94),
                   child: Column(
                     children: <Widget>[
-                      SizedBox(height: 100,),
+                      const SizedBox(height: 100),
                       ListTile(
-                        title: Text('TESTANDO',
+                        title: const Text(
+                          'TESTANDO',
                           style: TextStyle(
-                            color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold
+                            color: Colors.white,
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Text('TESTANDO@gmail.com',
+                        subtitle: const Text(
+                          'TESTANDO@gmail.com',
                           style: TextStyle(
-                            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold
-                          )
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       Divider(
                         height: 64,
                         thickness: 0.5,
-                        color: Colors.white.withValues(alpha: 0.3),
+                        color: Colors.white.withOpacity(0.3),
                         indent: 32,
                         endIndent: 32,
                       ),
                       MenuItem(
-                        icon: Icons.bar_chart, 
-                        title: 'Dashboard'
+                        icon: Icons.bar_chart,
+                        title: 'Dashboard',
+                        onTap: () {
+                          onIconPressed();
+                        context
+                          .read<NavigationBloc>()
+                          .add(NavigationEvents.DashboardClickedEvent);
+                        },
                       ),
                       MenuItem(
-                        icon: Icons.person, 
-                        title: 'Controle de usuários'
+                        icon: Icons.person,
+                        title: 'Controle de usuários',
+                        onTap: () {
+                          onIconPressed();
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                        },
                       ),
                       MenuItem(
-                        icon: Icons.library_books, 
-                        title: 'Controle de locatários'
+                        icon: Icons.library_books,
+                        title: 'Controle de locatários',
+                        onTap: () {
+                          onIconPressed();
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                        },
                       ),
                       MenuItem(
-                        icon: Icons.edit, 
-                        title: 'Controle de editoras'
+                        icon: Icons.edit,
+                        title: 'Controle de editoras',
+                        onTap: () {
+                          onIconPressed();
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                        },
                       ),
                       MenuItem(
-                        icon: Icons.book, 
-                        title: 'Controle de livros'
+                        icon: Icons.book,
+                        title: 'Controle de livros',
+                        onTap: () {
+                          onIconPressed();
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                        },
                       ),
                       MenuItem(
-                        icon: Icons.bookmark, 
-                        title: 'Controle de aluguéis'
+                        icon: Icons.bookmark,
+                        title: 'Controle de aluguéis',
+                        onTap: () {
+                          onIconPressed();
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                        },
                       ),
                       Divider(
                         height: 304,
                         thickness: 0.5,
-                        color: Colors.white.withValues(alpha: 0),
+                        color: Colors.white.withOpacity(0),
                         indent: 32,
                         endIndent: 32,
                       ),
                       MenuItem(
-                        icon: Icons.exit_to_app, 
-                        title: 'Logout'
+                        icon: Icons.exit_to_app,
+                        title: 'Logout',
+                        onTap: () {
+                          logoutFunction(context);
+                        },
                       ),
                     ],
                   ),
@@ -136,7 +191,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                     child: Container(
                       width: 35,
                       height: 110,
-                      color: Color.fromARGB(255, 0, 83, 94),
+                      color: const Color.fromARGB(255, 0, 83, 94),
                       alignment: Alignment.centerLeft,
                       child: AnimatedIcon(
                         icon: AnimatedIcons.menu_close,
@@ -168,8 +223,8 @@ class CustomMenuClipper extends CustomClipper<Path> {
     Path path = Path();
     path.moveTo(0, 0);
     path.quadraticBezierTo(0, 8, 10, 16);
-    path.quadraticBezierTo(width-1, height/2 - 20, width, height/2);
-    path.quadraticBezierTo(width + 1, height/2 + 20, 10, height-16);
+    path.quadraticBezierTo(width - 1, height / 2 - 20, width, height / 2);
+    path.quadraticBezierTo(width + 1, height / 2 + 20, 10, height - 16);
     path.quadraticBezierTo(0, height - 8, 0, height);
 
     path.close();
