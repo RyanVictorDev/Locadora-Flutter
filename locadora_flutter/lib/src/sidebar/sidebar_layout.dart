@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locadora_flutter/src/bloc.navigation_bloc/navigation_bloc.dart';
 import 'package:locadora_flutter/src/sidebar/sidebar.dart' as customSidebar;
 import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
-import 'package:locadora_flutter/src/views/publisher_flutter.dart';
+import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 
 class SidebarLayout extends StatelessWidget {
   const SidebarLayout({Key? key}) : super(key: key);

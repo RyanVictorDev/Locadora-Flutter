@@ -56,12 +56,13 @@ class ApiService {
         throw Exception(
             'Erro na requisição GET: ${response.statusCode} - ${response.body}');
       }
-    } catch (e) {
+    }
+    catch (e) {
       throw Exception('Erro na requisição GET: $e');
     }
   }
 
-    Future<http.Response> getAll(String endpoint) async {
+  Future<http.Response> getAll(String endpoint) async {
     final url = Uri.parse('$baseURL$endpoint');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
@@ -84,6 +85,4 @@ class ApiService {
       throw Exception('Erro na requisição GET: $e');
     }
   }
-
-
 }

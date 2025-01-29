@@ -34,8 +34,9 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
           title: Padding(
             padding: const EdgeInsets.only(left: 30.0),
             child: Text('Dashboard',
-                style: TextStyle(
-                    color: Colors.black, fontWeight: FontWeight.bold)
+              style: TextStyle(
+                  color: Colors.black, fontWeight: FontWeight.bold
+                  )
             ),
           )
         ),

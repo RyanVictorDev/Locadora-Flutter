@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locadora_flutter/main.dart';
 import 'package:locadora_flutter/src/bloc.navigation_bloc/navigation_bloc.dart';
 import 'package:locadora_flutter/src/sidebar/menu_item.dart';
-import 'package:locadora_flutter/src/views/publisher_flutter.dart';
+import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Sidebar extends StatefulWidget {
