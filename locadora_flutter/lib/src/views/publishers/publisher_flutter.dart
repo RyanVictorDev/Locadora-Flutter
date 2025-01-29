@@ -6,6 +6,7 @@ import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
+import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
 
 class PublisherFlutter extends StatefulWidget {
   @override
@@ -186,7 +187,7 @@ class DataTablePublisher extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    PublisherCreate(),
+                                    PublisherUpdate(id: publisher.id),
                               ),
                             );
                           },
