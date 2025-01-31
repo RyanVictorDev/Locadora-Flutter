@@ -2,25 +2,30 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
 import 'package:locadora_flutter/src/models/publisher_model.dart';
+import 'package:locadora_flutter/src/models/renter_model.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
+import 'package:locadora_flutter/src/services/renter_service.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
+import 'package:locadora_flutter/src/views/renters/renter_create.dart';
+import 'package:locadora_flutter/src/views/renters/renter_details.dart';
+import 'package:locadora_flutter/src/views/renters/renter_update.dart';
 
-class PublisherFlutter extends StatefulWidget {
+class RenterFlutter extends StatefulWidget {
   @override
-  _PublisherFlutterState createState() => _PublisherFlutterState();
+  _RenterFlutterState createState() => _RenterFlutterState();
 }
 
-class _PublisherFlutterState extends State<PublisherFlutter> {
-  late Future<List<PublisherModel>> publishersFuture;
+class _RenterFlutterState extends State<RenterFlutter> {
+  late Future<List<RenterModel>> rentersFuture;
   int page = 0;
   final String search = "";
 
   @override
   void initState() {
     super.initState();
-    _loadPublishers();
+    _loadRenters();
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -33,23 +38,23 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
     );
   }
 
-  void _loadPublishers() {
+  void _loadRenters() {
     setState(() {
-      publishersFuture = PublisherService().fetchPublishers(search, page);
+      rentersFuture = RenterService().fetchRenters(search, page);
     });
   }
 
   void _nextPage() {
     setState(() {
       page += 1;
-      _loadPublishers();
+      _loadRenters();
     });
   }
 
   void _previousPage() {
     setState(() {
       page -= 1;
-      _loadPublishers();
+      _loadRenters();
     });
   }
 
@@ -61,7 +66,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
         title: Padding(
           padding: const EdgeInsets.only(left: 30.0),
           child: Text(
-            'Publisher',
+            'Locatarios',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
@@ -76,7 +81,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PublisherCreate(),
+                    builder: (context) => RenterCreate(),
                   ),
                 );
               },
@@ -84,8 +89,8 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder<List<PublisherModel>>(
-                future: publishersFuture,
+              child: FutureBuilder<List<RenterModel>>(
+                future: rentersFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -95,9 +100,9 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                     return Center(child: Text('Nenhum dado disponível'));
                   }
 
-                  final publishers = snapshot.data!;
-                  return DataTablePublisher(
-                    publishers: publishers,
+                  final renters = snapshot.data!;
+                  return DataTableRenter(
+                    renters: renters,
                   );
                 },
               ),
@@ -123,12 +128,12 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   }
 }
 
-class DataTablePublisher extends StatelessWidget {
-  final List<PublisherModel> publishers;
+class DataTableRenter extends StatelessWidget {
+  final List<RenterModel> renters;
 
-  const DataTablePublisher({
+  const DataTableRenter({
     super.key,
-    required this.publishers,
+    required this.renters,
   });
 
   void _showDeleteConfirmationDialog(BuildContext context, int id) {
@@ -137,7 +142,7 @@ class DataTablePublisher extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Confirmar Exclusão"),
-          content: Text("Tem certeza de que deseja excluir esta editora?"),
+          content: Text("Tem certeza de que deseja excluir este locatario?"),
           actions: [
             TextButton(
               onPressed: () {
@@ -148,7 +153,7 @@ class DataTablePublisher extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await PublisherService().deletePublisher(id: id, context: context);
+                await RenterService().deleteRenter(id: id, context: context);
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),
@@ -200,12 +205,12 @@ class DataTablePublisher extends StatelessWidget {
                 ),
               ),
             ],
-            rows: publishers.map((publisher) {
+            rows: renters.map((renter) {
               return DataRow(
                 cells: [
-                  DataCell(Text(publisher.name)),
-                  DataCell(Text(publisher.email)),
-                  DataCell(Text(publisher.telephone)),
+                  DataCell(Text(renter.name)),
+                  DataCell(Text(renter.email)),
+                  DataCell(Text(renter.telephone)),
                   DataCell(
                     Row(
                       children: [
@@ -215,7 +220,7 @@ class DataTablePublisher extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    PublisherDetails(id: publisher.id),
+                                    RenterDetails(id: renter.id),
                               ),
                             );
                           },
@@ -228,7 +233,7 @@ class DataTablePublisher extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    PublisherUpdate(id: publisher.id),
+                                    RenterUpdate(id: renter.id),
                               ),
                             );
                           },
@@ -238,7 +243,7 @@ class DataTablePublisher extends StatelessWidget {
                         IconButton(
                           onPressed: () {
                             _showDeleteConfirmationDialog(
-                                context, publisher.id);
+                                context, renter.id);
                           },
                           icon: Icon(Icons.delete),
                           tooltip: 'Excluir',

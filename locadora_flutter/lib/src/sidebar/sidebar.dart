@@ -137,7 +137,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                         title: 'Controle de locatários',
                         onTap: () {
                           onIconPressed();
-                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.RenterClickedEvent);
                         },
                       ),
                       MenuItem(
