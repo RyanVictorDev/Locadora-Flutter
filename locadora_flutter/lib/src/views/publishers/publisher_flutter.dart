@@ -15,7 +15,8 @@ class PublisherFlutter extends StatefulWidget {
 class _PublisherFlutterState extends State<PublisherFlutter> {
   late Future<List<PublisherModel>> publishersFuture;
   int page = 0;
-  final String search = "";
+  String search = "";
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -36,6 +37,14 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   void _loadPublishers() {
     setState(() {
       publishersFuture = PublisherService().fetchPublishers(search, page);
+    });
+  }
+
+    void _updateSearch(String value) {
+    setState(() {
+      search = value;
+      page = 0;
+      _loadPublishers();
     });
   }
 
@@ -71,16 +80,32 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PublisherCreate(),
+            Row(
+              children: [
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PublisherCreate(),
+                      ),
+                    );
+                  },
+                  child: Text('Registrar'),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: "Pesquisar Locatário",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: _updateSearch,
                   ),
-                );
-              },
-              child: Text('Registrar'),
+                ),
+              ],
             ),
             SizedBox(height: 10),
             Expanded(

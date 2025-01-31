@@ -1,13 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
-import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/models/renter_model.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
 import 'package:locadora_flutter/src/views/renters/renter_create.dart';
 import 'package:locadora_flutter/src/views/renters/renter_details.dart';
 import 'package:locadora_flutter/src/views/renters/renter_update.dart';
@@ -20,7 +15,8 @@ class RenterFlutter extends StatefulWidget {
 class _RenterFlutterState extends State<RenterFlutter> {
   late Future<List<RenterModel>> rentersFuture;
   int page = 0;
-  final String search = "";
+  String search = "";
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -44,6 +40,14 @@ class _RenterFlutterState extends State<RenterFlutter> {
     });
   }
 
+  void _updateSearch(String value) {
+    setState(() {
+      search = value;
+      page = 0;
+      _loadRenters();
+    });
+  }
+
   void _nextPage() {
     setState(() {
       page += 1;
@@ -52,10 +56,12 @@ class _RenterFlutterState extends State<RenterFlutter> {
   }
 
   void _previousPage() {
-    setState(() {
-      page -= 1;
-      _loadRenters();
-    });
+    if (page > 0) {
+      setState(() {
+        page -= 1;
+        _loadRenters();
+      });
+    }
   }
 
   @override
@@ -66,7 +72,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
         title: Padding(
           padding: const EdgeInsets.only(left: 30.0),
           child: Text(
-            'Locatarios',
+            'Locatários',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
@@ -76,16 +82,32 @@ class _RenterFlutterState extends State<RenterFlutter> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => RenterCreate(),
+            Row(
+              children: [
+                SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RenterCreate(),
+                      ),
+                    );
+                  },
+                  child: Text('Registrar'),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: "Pesquisar Locatário",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: _updateSearch,
                   ),
-                );
-              },
-              child: Text('Registrar'),
+                ),
+              ],
             ),
             SizedBox(height: 10),
             Expanded(
@@ -101,9 +123,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                   }
 
                   final renters = snapshot.data!;
-                  return DataTableRenter(
-                    renters: renters,
-                  );
+                  return DataTableRenter(renters: renters);
                 },
               ),
             ),
@@ -142,7 +162,7 @@ class DataTableRenter extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Confirmar Exclusão"),
-          content: Text("Tem certeza de que deseja excluir este locatario?"),
+          content: Text("Tem certeza de que deseja excluir este locatário?"),
           actions: [
             TextButton(
               onPressed: () {
@@ -242,8 +262,7 @@ class DataTableRenter extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            _showDeleteConfirmationDialog(
-                                context, renter.id);
+                            _showDeleteConfirmationDialog(context, renter.id);
                           },
                           icon: Icon(Icons.delete),
                           tooltip: 'Excluir',
