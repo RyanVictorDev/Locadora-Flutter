@@ -1,19 +1,24 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
-import 'package:locadora_flutter/src/models/publisher_model.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
+import 'package:locadora_flutter/src/models/book_model.dart';
+import 'package:locadora_flutter/src/models/renter_model.dart';
+import 'package:locadora_flutter/src/services/book_service.dart';
+import 'package:locadora_flutter/src/services/renter_service.dart';
+import 'package:locadora_flutter/src/views/books/book_create.dart';
+import 'package:locadora_flutter/src/views/books/book_details.dart';
+import 'package:locadora_flutter/src/views/books/book_update.dart';
+import 'package:locadora_flutter/src/views/renters/renter_create.dart';
+import 'package:locadora_flutter/src/views/renters/renter_details.dart';
+import 'package:locadora_flutter/src/views/renters/renter_update.dart';
 
-class PublisherFlutter extends StatefulWidget {
+class BookFlutter extends StatefulWidget {
   @override
-  _PublisherFlutterState createState() => _PublisherFlutterState();
+  _BookFlutterState createState() => _BookFlutterState();
 }
 
-class _PublisherFlutterState extends State<PublisherFlutter> {
-  late Future<List<PublisherModel>> publishersFuture;
+class _BookFlutterState extends State<BookFlutter> {
+  late Future<List<BookModel>> booksFuture;
   int page = 0;
   String search = "";
   final TextEditingController _searchController = TextEditingController();
@@ -21,7 +26,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   @override
   void initState() {
     super.initState();
-    _loadPublishers();
+    _loadBooks();
   }
 
   void _showMessage(String message, {bool isError = false}) {
@@ -34,32 +39,34 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
     );
   }
 
-  void _loadPublishers() {
+  void _loadBooks() {
     setState(() {
-      publishersFuture = PublisherService().fetchPublishers(search, page);
+      booksFuture = BookService().fetchBooks(search, page);
     });
   }
 
-    void _updateSearch(String value) {
+  void _updateSearch(String value) {
     setState(() {
       search = value;
       page = 0;
-      _loadPublishers();
+      _loadBooks();
     });
   }
 
   void _nextPage() {
     setState(() {
       page += 1;
-      _loadPublishers();
+      _loadBooks();
     });
   }
 
   void _previousPage() {
-    setState(() {
-      page -= 1;
-      _loadPublishers();
-    });
+    if (page > 0) {
+      setState(() {
+        page -= 1;
+        _loadBooks();
+      });
+    }
   }
 
   @override
@@ -70,7 +77,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
         title: Padding(
           padding: const EdgeInsets.only(left: 30.0),
           child: Text(
-            'Editora',
+            'Livros',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
@@ -88,7 +95,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PublisherCreate(),
+                        builder: (context) => BookCreate(),
                       ),
                     );
                   },
@@ -98,7 +105,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      labelText: "Pesquisar Editora",
+                      labelText: "Pesquisar Livro",
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
@@ -109,8 +116,8 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
             ),
             SizedBox(height: 10),
             Expanded(
-              child: FutureBuilder<List<PublisherModel>>(
-                future: publishersFuture,
+              child: FutureBuilder<List<BookModel>>(
+                future: booksFuture,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: CircularProgressIndicator());
@@ -120,10 +127,8 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                     return Center(child: Text('Nenhum dado disponível'));
                   }
 
-                  final publishers = snapshot.data!;
-                  return DataTablePublisher(
-                    publishers: publishers,
-                  );
+                  final books = snapshot.data!;
+                  return DataTableBook(books: books);
                 },
               ),
             ),
@@ -148,12 +153,12 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   }
 }
 
-class DataTablePublisher extends StatelessWidget {
-  final List<PublisherModel> publishers;
+class DataTableBook extends StatelessWidget {
+  final List<BookModel> books;
 
-  const DataTablePublisher({
+  const DataTableBook({
     super.key,
-    required this.publishers,
+    required this.books,
   });
 
   void _showDeleteConfirmationDialog(BuildContext context, int id) {
@@ -162,7 +167,7 @@ class DataTablePublisher extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text("Confirmar Exclusão"),
-          content: Text("Tem certeza de que deseja excluir esta editora?"),
+          content: Text("Tem certeza de que deseja excluir este livro?"),
           actions: [
             TextButton(
               onPressed: () {
@@ -173,7 +178,7 @@ class DataTablePublisher extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await PublisherService().deletePublisher(id: id, context: context);
+                await BookService().deleteBook(id: id, context: context);
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),
@@ -205,14 +210,21 @@ class DataTablePublisher extends StatelessWidget {
               ),
               DataColumn(
                 label: Text(
-                  'Email',
+                  'Autor',
                   style: TextStyle(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
               ),
               DataColumn(
                 label: Text(
-                  'Telefone',
+                  'Disponíveis',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  'Alugados',
                   style: TextStyle(fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
@@ -225,12 +237,13 @@ class DataTablePublisher extends StatelessWidget {
                 ),
               ),
             ],
-            rows: publishers.map((publisher) {
+            rows: books.map((book) {
               return DataRow(
                 cells: [
-                  DataCell(Text(publisher.name)),
-                  DataCell(Text(publisher.email)),
-                  DataCell(Text(publisher.telephone)),
+                  DataCell(Text(book.name)),
+                  DataCell(Text(book.author)),
+                  DataCell(Text(book.totalQuantity.toString())),
+                  DataCell(Text(book.totalInUse.toString())),
                   DataCell(
                     Row(
                       children: [
@@ -240,7 +253,7 @@ class DataTablePublisher extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    PublisherDetails(id: publisher.id),
+                                    BookDetails(id: book.id),
                               ),
                             );
                           },
@@ -254,7 +267,7 @@ class DataTablePublisher extends StatelessWidget {
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
-                                    PublisherUpdate(id: publisher.id),
+                                    BookUpdate(id: book.id),
                               ),
                             );
                           },
@@ -264,8 +277,7 @@ class DataTablePublisher extends StatelessWidget {
                         ),
                         IconButton(
                           onPressed: () {
-                            _showDeleteConfirmationDialog(
-                                context, publisher.id);
+                            _showDeleteConfirmationDialog(context, book.id);
                           },
                           icon: Icon(Icons.delete),
                           tooltip: 'Excluir',

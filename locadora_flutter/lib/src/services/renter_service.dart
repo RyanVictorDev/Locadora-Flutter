@@ -8,13 +8,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 class RenterService {
-  static const String baseURL =
-      'https://locadora-ryan-back.altislabtech.com.br';
+  static const String baseURL = 'https://locadora-ryan-back.altislabtech.com.br';
 
   Future<void> createRenter({
     required String name,
     required String email,
-    required int telephone,
+    required String telephone,
     required String address,
     required String cpf,
   }) async {
@@ -93,11 +92,11 @@ class RenterService {
     required int id,
     required String name,
     required String email,
-    required int telephone,
+    required String telephone,
     required String address,
     required String cpf,
   }) async {
-    final url = Uri.parse('$baseURL/publisher/$id');
+    final url = Uri.parse('$baseURL/renter/$id');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 

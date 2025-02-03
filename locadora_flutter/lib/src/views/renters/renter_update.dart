@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
@@ -16,9 +17,9 @@ class _RenterUpdateState extends State<RenterUpdate> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _telephoneController = MaskedTextController(mask: '(00)00000-0000');
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _cpfController = MaskedTextController(mask: '000.000.000-00');
 
   final RenterService _renterService = RenterService();
   bool _isLoading = true;
@@ -36,7 +37,7 @@ class _RenterUpdateState extends State<RenterUpdate> {
         setState(() {
           _nameController.text = renter.name;
           _emailController.text = renter.email;
-          _telephoneController.text = renter.telephone.toString();
+          _telephoneController.text = renter.telephone;
           _addressController.text = renter.address;
           _cpfController.text = renter.cpf;
           _isLoading = false;
@@ -56,7 +57,7 @@ class _RenterUpdateState extends State<RenterUpdate> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final email = _emailController.text;
-      final telephone = int.tryParse(_telephoneController.text) ?? 0;
+      final telephone = _telephoneController.text;
       final address = _addressController.text;
       final cpf = _cpfController.text;
 

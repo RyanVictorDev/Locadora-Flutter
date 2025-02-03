@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 
@@ -15,7 +16,7 @@ class _PublisherUpdateState extends State<PublisherUpdate> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _telephoneController = MaskedTextController(mask: '(00)00000-0000');
   final TextEditingController _siteController = TextEditingController();
 
   final PublisherService _publisherService = PublisherService();
@@ -34,7 +35,7 @@ class _PublisherUpdateState extends State<PublisherUpdate> {
         setState(() {
           _nameController.text = publisher.name;
           _emailController.text = publisher.email;
-          _telephoneController.text = publisher.telephone.toString();
+          _telephoneController.text = publisher.telephone;
           _siteController.text = publisher.site ?? '';
           _isLoading = false;
         });
@@ -53,7 +54,7 @@ class _PublisherUpdateState extends State<PublisherUpdate> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final email = _emailController.text;
-      final telephone = int.tryParse(_telephoneController.text) ?? 0;
+      final telephone = _telephoneController.text;
       final site = _siteController.text;
 
       try {

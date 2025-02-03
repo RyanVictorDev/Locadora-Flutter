@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locadora_flutter/src/bloc.navigation_bloc/navigation_bloc.dart';
 import 'package:locadora_flutter/src/sidebar/sidebar.dart' as customSidebar;
+import 'package:locadora_flutter/src/views/books/book_flutter.dart';
 import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 import 'package:locadora_flutter/src/views/renters/renter_flutter.dart';
@@ -24,6 +25,8 @@ class SidebarLayout extends StatelessWidget {
                   return PublisherFlutter();
                 } else if (navigationState is RenterState) {
                   return RenterFlutter();
+                } else if (navigationState is BookState) {
+                  return BookFlutter();
                 }
                 return const Center(child: Text('Unknown State'));
               },

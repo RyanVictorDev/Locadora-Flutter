@@ -246,6 +246,7 @@ class DataTableRenter extends StatelessWidget {
                           },
                           icon: Icon(Icons.visibility),
                           tooltip: 'Ver mais',
+                          color: Colors.blueAccent,
                         ),
                         IconButton(
                           onPressed: () {
@@ -259,6 +260,7 @@ class DataTableRenter extends StatelessWidget {
                           },
                           icon: Icon(Icons.edit),
                           tooltip: 'Editar',
+                          color: const Color.fromARGB(255, 81, 207, 146),
                         ),
                         IconButton(
                           onPressed: () {

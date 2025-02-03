@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
@@ -15,9 +16,9 @@ class _RenterCreateState extends State<RenterCreate> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _telephoneController = MaskedTextController(mask: '(00)00000-0000');
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _cpfController = MaskedTextController(mask: '000.000.000-00');
 
   final RenterService _renterService = RenterService();
 
@@ -25,7 +26,7 @@ class _RenterCreateState extends State<RenterCreate> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final email = _emailController.text;
-      final telephone = int.tryParse(_telephoneController.text) ?? 0;
+      final telephone = _telephoneController.text;
       final address = _addressController.text;
       final cpf = _cpfController.text;
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 
@@ -14,7 +15,7 @@ class _PublisherCreateState extends State<PublisherCreate> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _telephoneController = TextEditingController();
+  final TextEditingController _telephoneController = MaskedTextController(mask: '(00)00000-0000');
   final TextEditingController _siteController = TextEditingController();
 
   final PublisherService _publisherService = PublisherService();
@@ -23,8 +24,7 @@ class _PublisherCreateState extends State<PublisherCreate> {
     if (_formKey.currentState!.validate()) {
       final name = _nameController.text;
       final email = _emailController.text;
-      final telephone =
-          int.tryParse(_telephoneController.text) ?? 0; 
+      final telephone = _telephoneController.text; 
       final site = _siteController.text;
 
       try {
@@ -147,7 +147,6 @@ class _PublisherCreateState extends State<PublisherCreate> {
 
   @override
   void dispose() {
-    // Limpa os controladores para evitar vazamentos de memória
     _nameController.dispose();
     _emailController.dispose();
     _telephoneController.dispose();
