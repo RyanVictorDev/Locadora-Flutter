@@ -161,7 +161,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                         title: 'Controle de aluguéis',
                         onTap: () {
                           onIconPressed();
-                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.PublisherClickedEvent);
+                          BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.RentClickedEvent);
                         },
                       ),
                       Divider(
@@ -183,7 +183,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                 ),
               ),
               Align(
-                alignment: const Alignment(0, -0.9),
+                alignment: const Alignment(0, -0.95),
                 child: GestureDetector(
                   onTap: onIconPressed,
                   child: ClipPath(

@@ -5,6 +5,7 @@ enum NavigationEvents {
   PublisherClickedEvent,
   RenterClickedEvent,
   BookClickedEvent,
+  RentClickedEvent,
 }
 
 abstract class NavigationStates {}
@@ -17,6 +18,8 @@ class RenterState extends NavigationStates {}
 
 class BookState extends NavigationStates {}
 
+class RentState extends NavigationStates {}
+
 class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
   NavigationBloc() : super(DashboardState()) {
     on<NavigationEvents>((event, emit) {
@@ -28,6 +31,8 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         emit(RenterState());
       } else if (event == NavigationEvents.BookClickedEvent) {
         emit(BookState());
+      } else if (event == NavigationEvents.RentClickedEvent) {
+        emit(RentState());
       }
     });
   }

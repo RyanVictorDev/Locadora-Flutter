@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
+import 'package:locadora_flutter/src/models/book_model.dart';
 import 'dart:convert';
 
 import 'package:locadora_flutter/src/models/publisher_model.dart';
+import 'package:locadora_flutter/src/models/rent_model.dart';
+import 'package:locadora_flutter/src/models/renter_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class PublisherService {
-  static const String baseURL = 'https://locadora-ryan-back.altislabtech.com.br';
+class RentService {
+  static const String baseURL =
+      'https://locadora-ryan-back.altislabtech.com.br';
 
-  Future<void> createPublisher({
-    required String name,
-    required String email,
-    required String telephone,
-    required String site,
+  Future<void> createRent({
+    required int renterId,
+    required int bookId,
+    required String deadLine
   }) async {
-    final url = Uri.parse('$baseURL/publisher');
+    final url = Uri.parse('$baseURL/rent');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -25,50 +28,38 @@ class PublisherService {
     };
 
     final body = jsonEncode({
-      "name": name,
-      "email": email,
-      "telephone": telephone,
-      "site": site,
+      "renterId": renterId,
+      "bookId": bookId,
+      "deadLine": deadLine,
     });
 
     try {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 201) {
-        print("Publisher criado com sucesso!");
+        print("Aluguel criado com sucesso!");
       } else {
         print(
-            'Erro ao criar publisher: ${response.statusCode} - ${response.body}');
+            'Erro ao criar aluguel: ${response.statusCode} - ${response.body} - $body');
       }
     } catch (e) {
       throw Exception('Erro na requisição POST: $e');
     }
   }
 
-  Future<List<PublisherModel>> fetchPublishers(String search, int page) async {
+  Future<List<RentModel>> fetchRents(String search, int page) async {
     final apiService = ApiService();
-    final response = await apiService.fetchData('/publisher?search=$search&page=$page');
+    final response =
+        await apiService.fetchData('/rent?search=$search&page=$page&status=');
 
     final Map<String, dynamic> jsonData = jsonDecode(response.body);
     final List<dynamic> content = jsonData["content"];
 
-    return content.map((value) => PublisherModel.fromJson(value)).toList();
+    return content.map((value) => RentModel.fromJson(value)).toList();
   }
 
-  Future<List<PublisherModel>> fetchAllPublishers(String search) async {
-    final apiService = ApiService();
-    final response =
-        await apiService.fetchData('/publisher?search=$search');
-
-    final dynamic jsonData = jsonDecode(response.body);
-
-    final List<dynamic> content = jsonData is List ? jsonData : jsonData["content"];
-
-    return content.map((value) => PublisherModel.fromJson(value)).toList();
-  }
-
-  Future<PublisherModel?> getById({required int id}) async {
-    final url = Uri.parse('$baseURL/publisher/$id');
+  Future<RentModel?> getById({required int id}) async {
+    final url = Uri.parse('$baseURL/rent/$id');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -84,8 +75,8 @@ class PublisherService {
         print("sucesso!");
 
         final Map<String, dynamic> jsonData = jsonDecode(response.body);
-        print(PublisherModel.fromJson(jsonData));
-        return PublisherModel.fromJson(jsonData);
+        print(RentModel.fromJson(jsonData));
+        return RentModel.fromJson(jsonData);
       } else {
         print('Erro: ${response.statusCode} - ${response.body}');
         return null;
@@ -95,14 +86,13 @@ class PublisherService {
     }
   }
 
-  Future<void> updatePublisher({
+  Future<void> updateRent({
     required int id,
-    required String name,
-    required String email,
-    required String telephone,
-    required String site,
+    required int renterId,
+    required int bookId,
+    required String deadLine,
   }) async {
-    final url = Uri.parse('$baseURL/publisher/$id');
+    final url = Uri.parse('$baseURL/rent/$id');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -112,29 +102,28 @@ class PublisherService {
     };
 
     final body = jsonEncode({
-      "name": name,
-      "email": email,
-      "telephone": telephone,
-      "site": site,
+      "renterId": renterId,
+      "bookId": bookId,
+      "deadLine": deadLine,
     });
 
     try {
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        print("Editora editada com sucesso!");
+        print("Aluguel editado com sucesso!");
       } else {
         print(
-            'Erro ao editar editora: ${response.statusCode} - ${response.body}');
+            'Erro ao editar aluguel: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
       throw Exception('Erro na requisição POST: $e');
     }
   }
 
-  Future<bool> deletePublisher(
+  Future<bool> deliveryRent(
       {required int id, required BuildContext context}) async {
-    final url = Uri.parse('$baseURL/publisher/$id');
+    final url = Uri.parse('$baseURL/rent/$id');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 
@@ -144,12 +133,12 @@ class PublisherService {
     };
 
     try {
-      final response = await http.delete(url, headers: headers);
+      final response = await http.put(url, headers: headers);
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Editora excluída com sucesso!"),
+            content: Text("Aluguel devolvido com sucesso!"),
             backgroundColor: Colors.green,
           ),
         );
@@ -157,7 +146,7 @@ class PublisherService {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao excluir: ${response.body}'),
+            content: Text('Erro ao devolver: ${response.body}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -166,12 +155,11 @@ class PublisherService {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Erro na requisição DELETE: $e'),
+          content: Text('Erro na requisição: $e'),
           backgroundColor: Colors.red,
         ),
       );
       return false;
     }
   }
-
 }

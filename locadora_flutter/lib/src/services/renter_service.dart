@@ -59,6 +59,18 @@ class RenterService {
     return content.map((value) => RenterModel.fromJson(value)).toList();
   }
 
+  Future<List<RenterModel>> fetchAllRenters(String search) async {
+    final apiService = ApiService();
+    final response =
+        await apiService.fetchData('/renter?search=$search');
+
+    final dynamic jsonData = jsonDecode(response.body);
+
+    final List<dynamic> content = jsonData is List ? jsonData : jsonData["content"];
+
+    return content.map((value) => RenterModel.fromJson(value)).toList();
+  }
+
   Future<RenterModel?> getById({required int id}) async {
     final url = Uri.parse('$baseURL/renter/$id');
     final prefs = await SharedPreferences.getInstance();

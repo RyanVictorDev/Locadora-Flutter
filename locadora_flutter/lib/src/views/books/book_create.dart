@@ -66,7 +66,7 @@ class _BookCreateState extends State<BookCreate> {
   }
 
   Future<List<PublisherModel>> _fetchPublishers(String filter) async {
-    return await _publisherService.fetchPublishers(filter, 1);
+    return await _publisherService.fetchAllPublishers(filter);
   }
 
   @override

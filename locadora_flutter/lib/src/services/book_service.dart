@@ -60,6 +60,19 @@ class BookService {
     return content.map((value) => BookModel.fromJson(value)).toList();
   }
 
+  Future<List<BookModel>> fetchAllBooks(String search) async {
+    final apiService = ApiService();
+    final response =
+        await apiService.fetchData('/book?search=$search');
+
+    final dynamic jsonData = jsonDecode(response.body);
+
+    final List<dynamic> content =
+        jsonData is List ? jsonData : jsonData["content"];
+
+    return content.map((value) => BookModel.fromJson(value)).toList();
+  }
+
   Future<BookModel?> getById({required int id}) async {
     final url = Uri.parse('$baseURL/book/$id');
     final prefs = await SharedPreferences.getInstance();

@@ -39,8 +39,7 @@ class _BookUpdateState extends State<BookUpdate> {
           _authorController.text = book.author;
           _launchDateController.text = book.launchDate;
           _totalQuantityController.text = book.totalQuantity.toString();
-          _selectedPublisher =
-              book.publisher; // Preencher com a editora do livro
+          _selectedPublisher = book.publisher;
           _isLoading = false;
         });
       }
@@ -96,7 +95,7 @@ class _BookUpdateState extends State<BookUpdate> {
   }
 
   Future<List<PublisherModel>> _fetchPublishers(String filter) async {
-    return await _publisherService.fetchPublishers(filter, 1);
+    return await _publisherService.fetchAllPublishers(filter);
   }
 
   @override
