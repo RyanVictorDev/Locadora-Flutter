@@ -4,6 +4,7 @@ import 'package:locadora_flutter/src/services/rent_service.dart';
 import 'package:locadora_flutter/src/views/books/book_create.dart';
 import 'package:locadora_flutter/src/views/books/book_update.dart';
 import 'package:locadora_flutter/src/views/rents/rent_create.dart';
+import 'package:locadora_flutter/src/views/rents/rent_update.dart';
 
 class RentFlutter extends StatefulWidget {
   @override
@@ -261,7 +262,7 @@ class DataTableRent extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => BookUpdate(id: rent.id),
+                                builder: (context) => RentUpdate(id: rent.id),
                               ),
                             );
                           },
