@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/models/rent_model.dart';
 import 'package:locadora_flutter/src/services/rent_service.dart';
-import 'package:locadora_flutter/src/views/books/book_create.dart';
-import 'package:locadora_flutter/src/views/books/book_update.dart';
 import 'package:locadora_flutter/src/views/rents/rent_create.dart';
 import 'package:locadora_flutter/src/views/rents/rent_update.dart';
 
@@ -16,6 +14,7 @@ class _RentFlutterState extends State<RentFlutter> {
   int page = 0;
   String search = "";
   final TextEditingController _searchController = TextEditingController();
+  Map<int, bool> expandedState = {};
 
   @override
   void initState() {
@@ -23,19 +22,15 @@ class _RentFlutterState extends State<RentFlutter> {
     _loadRents();
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
   void _loadRents() {
     setState(() {
       rentsFuture = RentService().fetchRents(search, page);
+    });
+  }
+
+  void _toggleExpansion(int index) {
+    setState(() {
+      expandedState[index] = !(expandedState[index] ?? false);
     });
   }
 
@@ -67,11 +62,10 @@ class _RentFlutterState extends State<RentFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
         title: Padding(
           padding: const EdgeInsets.only(left: 30.0),
           child: Text(
-            'Aluguéis',
+            'Editoras',
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
         ),
@@ -79,22 +73,19 @@ class _RentFlutterState extends State<RentFlutter> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => RentCreate(),
-                      ),
+                      MaterialPageRoute(builder: (context) => RentCreate()),
                     );
                   },
                   child: Text('Registrar'),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _searchController,
@@ -118,11 +109,70 @@ class _RentFlutterState extends State<RentFlutter> {
                   } else if (snapshot.hasError) {
                     return Center(child: Text('Erro ao carregar dados'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Nenhum dado disponível'));
+                    return Center(child: Text('Nenhum aluguel encontrado'));
                   }
 
                   final rents = snapshot.data!;
-                  return DataTableRent(rents: rents);
+                  return ListView.builder(
+                    itemCount: rents.length,
+                    itemBuilder: (context, index) {
+                      final rent = rents[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(rent.renter.name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Livro: ${rent.book.name}"),
+                                Text("Alugado: ${rent.rentDate}"),
+                                Text("Devolução: ${rent.deadLine}"),
+                                Text("Status: ${_translateStatus(rent.status)}"),
+                              ],
+                            ),
+                            trailing: Icon(expandedState[index] == true
+                                ? Icons.expand_less
+                                : Icons.expand_more),
+                            onTap: () => _toggleExpansion(index),
+                          ),
+                          if (expandedState[index] == true)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.bookmark_border,
+                                        color: Colors.blueAccent),
+                                    tooltip: 'Devolver',
+                                    onPressed: () =>
+                                        _showDeliveryConfirmationDialog(
+                                            context, rent.id),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.green),
+                                    tooltip: 'Editar',
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RentUpdate(id: rent.id),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -145,15 +195,6 @@ class _RentFlutterState extends State<RentFlutter> {
       ),
     );
   }
-}
-
-class DataTableRent extends StatelessWidget {
-  final List<RentModel> rents;
-
-  const DataTableRent({
-    super.key,
-    required this.rents,
-  });
 
   void _showDeliveryConfirmationDialog(BuildContext context, int id) {
     showDialog(
@@ -164,9 +205,7 @@ class DataTableRent extends StatelessWidget {
           content: Text("Tem certeza de que deseja entregar este livro?"),
           actions: [
             TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text("Cancelar"),
             ),
             TextButton(
@@ -182,118 +221,18 @@ class DataTableRent extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: DataTable(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 231, 231, 231),
-            ),
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Locatário',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Livro',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Alugado',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Devolução',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Status',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Ações',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-            rows: rents.map((rent) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(rent.renter.name)),
-                  DataCell(Text(rent.book.name)),
-                  DataCell(Text(rent.rentDate)),
-                  DataCell(Text(rent.deadLine)),
-                  DataCell(Text(_translateStatus(rent.status))),
-                  DataCell(
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            _showDeliveryConfirmationDialog(context, rent.id);
-                          },
-                          icon: Icon(Icons.bookmark_border),
-                          tooltip: 'Devolver',
-                          color: Colors.blueAccent,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RentUpdate(id: rent.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit),
-                          tooltip: 'Editar',
-                          color: const Color.fromARGB(255, 81, 207, 146),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-String _translateStatus(String status) {
-  switch (status) {
-    case 'RENTED':
-      return 'Alugado';
-    case 'IN_TIME':
-      return 'Devolvido no prazo';
-    case 'LATE':
-      return 'Atrasado';
-    case 'DELIVERED_WITH_DELAY':
-      return 'Devolvido fora do prazo';
-    default:
-      return status;
+  String _translateStatus(String status) {
+    switch (status) {
+      case 'RENTED':
+        return 'Alugado';
+      case 'IN_TIME':
+        return 'Devolvido no prazo';
+      case 'LATE':
+        return 'Atrasado';
+      case 'DELIVERED_WITH_DELAY':
+        return 'Devolvido fora do prazo';
+      default:
+        return status;
+    }
   }
 }

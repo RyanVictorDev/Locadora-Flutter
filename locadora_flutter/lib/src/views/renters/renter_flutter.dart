@@ -17,6 +17,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
   int page = 0;
   String search = "";
   final TextEditingController _searchController = TextEditingController();
+  Map<int, bool> expandedState = {};
 
   @override
   void initState() {
@@ -45,6 +46,12 @@ class _RenterFlutterState extends State<RenterFlutter> {
       search = value;
       page = 0;
       _loadRenters();
+    });
+  }
+
+  void _toggleExpansion(int index) {
+    setState(() {
+      expandedState[index] = !(expandedState[index] ?? false);
     });
   }
 
@@ -80,22 +87,19 @@ class _RenterFlutterState extends State<RenterFlutter> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => RenterCreate(),
-                      ),
+                      MaterialPageRoute(builder: (context) => RenterCreate()),
                     );
                   },
                   child: Text('Registrar'),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _searchController,
@@ -104,7 +108,13 @@ class _RenterFlutterState extends State<RenterFlutter> {
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: _updateSearch,
+                    onChanged: (value) {
+                      setState(() {
+                        search = value;
+                        page = 0;
+                        _loadRenters();
+                      });
+                    },
                   ),
                 ),
               ],
@@ -123,7 +133,69 @@ class _RenterFlutterState extends State<RenterFlutter> {
                   }
 
                   final renters = snapshot.data!;
-                  return DataTableRenter(renters: renters);
+                  return ListView.builder(
+                    itemCount: renters.length,
+                    itemBuilder: (context, index) {
+                      final renter = renters[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(renter.name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(renter.email),
+                            trailing: Icon(expandedState[index] == true
+                                ? Icons.expand_less
+                                : Icons.expand_more),
+                            onTap: () => _toggleExpansion(index),
+                          ),
+                          if (expandedState[index] == true)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.visibility,
+                                        color: Colors.blueAccent),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RenterDetails(id: renter.id),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.green),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              RenterUpdate(id: renter.id),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      _showDeleteConfirmationDialog(
+                                          context, renter.id);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
             ),
@@ -132,7 +204,9 @@ class _RenterFlutterState extends State<RenterFlutter> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: _previousPage,
+                  onPressed: page > 0
+                      ? _previousPage
+                      : null, // Desabilita o botão de voltar se estiver na página 0
                   child: Text('<'),
                 ),
                 ElevatedButton(
@@ -146,15 +220,6 @@ class _RenterFlutterState extends State<RenterFlutter> {
       ),
     );
   }
-}
-
-class DataTableRenter extends StatelessWidget {
-  final List<RenterModel> renters;
-
-  const DataTableRenter({
-    super.key,
-    required this.renters,
-  });
 
   void _showDeleteConfirmationDialog(BuildContext context, int id) {
     showDialog(
@@ -174,111 +239,13 @@ class DataTableRenter extends StatelessWidget {
               onPressed: () async {
                 Navigator.of(context).pop();
                 await RenterService().deleteRenter(id: id, context: context);
+                _loadRenters();
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),
           ],
         );
       },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: DataTable(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 231, 231, 231),
-            ),
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Nome',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Email',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Telefone',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Ações',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-            rows: renters.map((renter) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(renter.name)),
-                  DataCell(Text(renter.email)),
-                  DataCell(Text(renter.telephone)),
-                  DataCell(
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RenterDetails(id: renter.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.visibility),
-                          tooltip: 'Ver mais',
-                          color: Colors.blueAccent,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    RenterUpdate(id: renter.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit),
-                          tooltip: 'Editar',
-                          color: const Color.fromARGB(255, 81, 207, 146),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(context, renter.id);
-                          },
-                          icon: Icon(Icons.delete),
-                          tooltip: 'Excluir',
-                          color: Colors.red,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
-        ),
-      ),
     );
   }
 }

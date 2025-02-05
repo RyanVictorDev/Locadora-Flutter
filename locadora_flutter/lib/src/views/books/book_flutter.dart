@@ -1,16 +1,9 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:locadora_flutter/src/api/api.dart';
 import 'package:locadora_flutter/src/models/book_model.dart';
-import 'package:locadora_flutter/src/models/renter_model.dart';
 import 'package:locadora_flutter/src/services/book_service.dart';
-import 'package:locadora_flutter/src/services/renter_service.dart';
 import 'package:locadora_flutter/src/views/books/book_create.dart';
 import 'package:locadora_flutter/src/views/books/book_details.dart';
 import 'package:locadora_flutter/src/views/books/book_update.dart';
-import 'package:locadora_flutter/src/views/renters/renter_create.dart';
-import 'package:locadora_flutter/src/views/renters/renter_details.dart';
-import 'package:locadora_flutter/src/views/renters/renter_update.dart';
 
 class BookFlutter extends StatefulWidget {
   @override
@@ -22,21 +15,12 @@ class _BookFlutterState extends State<BookFlutter> {
   int page = 0;
   String search = "";
   final TextEditingController _searchController = TextEditingController();
+  Map<int, bool> expandedState = {};
 
   @override
   void initState() {
     super.initState();
     _loadBooks();
-  }
-
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   void _loadBooks() {
@@ -45,35 +29,42 @@ class _BookFlutterState extends State<BookFlutter> {
     });
   }
 
-  void _updateSearch(String value) {
+  void _toggleExpansion(int index) {
     setState(() {
-      search = value;
-      page = 0;
-      _loadBooks();
+      expandedState[index] = !(expandedState[index] ?? false);
     });
   }
 
-  void _nextPage() {
-    setState(() {
-      page += 1;
-      _loadBooks();
-    });
-  }
-
-  void _previousPage() {
-    if (page > 0) {
-      setState(() {
-        page -= 1;
-        _loadBooks();
-      });
-    }
+  void _showDeleteConfirmationDialog(BuildContext context, int id) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Confirmar Exclusão"),
+          content: Text("Tem certeza de que deseja excluir este livro?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text("Cancelar"),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await BookService().deleteBook(id: id, context: context);
+                _loadBooks();
+              },
+              child: Text("Excluir", style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
         title: Padding(
           padding: const EdgeInsets.only(left: 30.0),
           child: Text(
@@ -85,22 +76,19 @@ class _BookFlutterState extends State<BookFlutter> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => BookCreate(),
-                      ),
+                      MaterialPageRoute(builder: (context) => BookCreate()),
                     );
                   },
                   child: Text('Registrar'),
                 ),
+                SizedBox(width: 10),
                 Expanded(
                   child: TextField(
                     controller: _searchController,
@@ -109,7 +97,13 @@ class _BookFlutterState extends State<BookFlutter> {
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: _updateSearch,
+                    onChanged: (value) {
+                      setState(() {
+                        search = value;
+                        page = 0;
+                        _loadBooks();
+                      });
+                    },
                   ),
                 ),
               ],
@@ -128,168 +122,93 @@ class _BookFlutterState extends State<BookFlutter> {
                   }
 
                   final books = snapshot.data!;
-                  return DataTableBook(books: books);
+                  return ListView.builder(
+                    itemCount: books.length,
+                    itemBuilder: (context, index) {
+                      final book = books[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(book.name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(book.author),
+                            trailing: Icon(expandedState[index] == true
+                                ? Icons.expand_less
+                                : Icons.expand_more),
+                            onTap: () => _toggleExpansion(index),
+                          ),
+                          if (expandedState[index] == true)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.visibility,
+                                        color: Colors.blueAccent),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BookDetails(id: book.id)),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.green),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                BookUpdate(id: book.id)),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () =>
+                                        _showDeleteConfirmationDialog(
+                                            context, book.id),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  );
                 },
               ),
             ),
-            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
-                  onPressed: _previousPage,
+                  onPressed: page > 0
+                      ? () => setState(() {
+                            page -= 1;
+                            _loadBooks();
+                          })
+                      : null,
                   child: Text('<'),
                 ),
                 ElevatedButton(
-                  onPressed: _nextPage,
+                  onPressed: () {
+                    setState(() {
+                      page += 1;
+                      _loadBooks();
+                    });
+                  },
                   child: Text('>'),
                 ),
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class DataTableBook extends StatelessWidget {
-  final List<BookModel> books;
-
-  const DataTableBook({
-    super.key,
-    required this.books,
-  });
-
-  void _showDeleteConfirmationDialog(BuildContext context, int id) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirmar Exclusão"),
-          content: Text("Tem certeza de que deseja excluir este livro?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancelar"),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-                await BookService().deleteBook(id: id, context: context);
-              },
-              child: Text("Excluir", style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: DataTable(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 231, 231, 231),
-            ),
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Nome',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Autor',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Disponíveis',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Alugados',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Ações',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-            rows: books.map((book) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(book.name)),
-                  DataCell(Text(book.author)),
-                  DataCell(Text(book.totalQuantity.toString())),
-                  DataCell(Text(book.totalInUse.toString())),
-                  DataCell(
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BookDetails(id: book.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.visibility),
-                          tooltip: 'Ver mais',
-                          color: Colors.blueAccent,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    BookUpdate(id: book.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit),
-                          tooltip: 'Editar',
-                          color: const Color.fromARGB(255, 81, 207, 146),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(context, book.id);
-                          },
-                          icon: Icon(Icons.delete),
-                          tooltip: 'Excluir',
-                          color: Colors.red,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
-          ),
         ),
       ),
     );

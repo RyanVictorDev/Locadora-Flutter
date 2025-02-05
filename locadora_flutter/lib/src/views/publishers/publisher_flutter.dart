@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:locadora_flutter/src/api/api.dart';
 import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
@@ -17,21 +15,12 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   int page = 0;
   String search = "";
   final TextEditingController _searchController = TextEditingController();
+  Map<int, bool> expandedState = {};
 
   @override
   void initState() {
     super.initState();
     _loadPublishers();
-  }
-
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
   }
 
   void _loadPublishers() {
@@ -40,121 +29,11 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
     });
   }
 
-    void _updateSearch(String value) {
+  void _toggleExpansion(int index) {
     setState(() {
-      search = value;
-      page = 0;
-      _loadPublishers();
+      expandedState[index] = !(expandedState[index] ?? false);
     });
   }
-
-  void _nextPage() {
-    setState(() {
-      page += 1;
-      _loadPublishers();
-    });
-  }
-
-  void _previousPage() {
-    setState(() {
-      page -= 1;
-      _loadPublishers();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color.fromARGB(0, 0, 83, 94),
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Editora',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => PublisherCreate(),
-                      ),
-                    );
-                  },
-                  child: Text('Registrar'),
-                ),
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      labelText: "Pesquisar Editora",
-                      border: OutlineInputBorder(),
-                      prefixIcon: Icon(Icons.search),
-                    ),
-                    onChanged: _updateSearch,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10),
-            Expanded(
-              child: FutureBuilder<List<PublisherModel>>(
-                future: publishersFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  } else if (snapshot.hasError) {
-                    return Center(child: Text('Erro ao carregar dados'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('Nenhum dado disponível'));
-                  }
-
-                  final publishers = snapshot.data!;
-                  return DataTablePublisher(
-                    publishers: publishers,
-                  );
-                },
-              ),
-            ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  onPressed: _previousPage,
-                  child: Text('<'),
-                ),
-                ElevatedButton(
-                  onPressed: _nextPage,
-                  child: Text('>'),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DataTablePublisher extends StatelessWidget {
-  final List<PublisherModel> publishers;
-
-  const DataTablePublisher({
-    super.key,
-    required this.publishers,
-  });
 
   void _showDeleteConfirmationDialog(BuildContext context, int id) {
     showDialog(
@@ -173,7 +52,9 @@ class DataTablePublisher extends StatelessWidget {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await PublisherService().deletePublisher(id: id, context: context);
+                await PublisherService()
+                    .deletePublisher(id: id, context: context);
+                _loadPublishers();
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),
@@ -185,99 +66,154 @@ class DataTablePublisher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.vertical,
-          child: DataTable(
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 231, 231, 231),
-            ),
-            columns: const [
-              DataColumn(
-                label: Text(
-                  'Nome',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Email',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Telefone',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  'Ações',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
-            rows: publishers.map((publisher) {
-              return DataRow(
-                cells: [
-                  DataCell(Text(publisher.name)),
-                  DataCell(Text(publisher.email)),
-                  DataCell(Text(publisher.telephone)),
-                  DataCell(
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PublisherDetails(id: publisher.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.visibility),
-                          tooltip: 'Ver mais',
-                          color: Colors.blueAccent,
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    PublisherUpdate(id: publisher.id),
-                              ),
-                            );
-                          },
-                          icon: Icon(Icons.edit),
-                          tooltip: 'Editar',
-                          color: const Color.fromARGB(255, 81, 207, 146),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            _showDeleteConfirmationDialog(
-                                context, publisher.id);
-                          },
-                          icon: Icon(Icons.delete),
-                          tooltip: 'Excluir',
-                          color: Colors.red,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              );
-            }).toList(),
+    return Scaffold(
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(left: 30.0),
+          child: Text(
+            'Editoras',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
           ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => PublisherCreate()),
+                    );
+                  },
+                  child: Text('Registrar'),
+                ),
+                SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      labelText: "Pesquisar Editora",
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        search = value;
+                        page = 0;
+                        _loadPublishers();
+                      });
+                    },
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: FutureBuilder<List<PublisherModel>>(
+                future: publishersFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Erro ao carregar dados'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('Nenhum dado disponível'));
+                  }
+
+                  final publishers = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: publishers.length,
+                    itemBuilder: (context, index) {
+                      final publisher = publishers[index];
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(publisher.name,
+                                style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text(publisher.email),
+                            trailing: Icon(expandedState[index] == true
+                                ? Icons.expand_less
+                                : Icons.expand_more),
+                            onTap: () => _toggleExpansion(index),
+                          ),
+                          if (expandedState[index] == true)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.visibility,
+                                        color: Colors.blueAccent),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PublisherDetails(
+                                                  id: publisher.id),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Colors.green),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              PublisherUpdate(id: publisher.id),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                    onPressed: () {
+                                      _showDeleteConfirmationDialog(
+                                          context, publisher.id);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          Divider(),
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                    onPressed: page > 0
+                        ? () => setState(() {
+                              page -= 1;
+                              _loadPublishers();
+                            })
+                        : null,
+                    child: Text('<')),
+                ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        page += 1;
+                        _loadPublishers();
+                      });
+                    },
+                    child: Text('>')),
+              ],
+            ),
+          ],
         ),
       ),
     );
