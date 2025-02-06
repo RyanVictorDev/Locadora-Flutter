@@ -7,6 +7,7 @@ import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 import 'package:locadora_flutter/src/views/renters/renter_flutter.dart';
 import 'package:locadora_flutter/src/views/rents/rent_flutter.dart';
+import 'package:locadora_flutter/src/views/user/user_flutter.dart';
 
 class SidebarLayout extends StatelessWidget {
   const SidebarLayout({Key? key}) : super(key: key);
@@ -30,6 +31,8 @@ class SidebarLayout extends StatelessWidget {
                   return BookFlutter();
                 } else if (navigationState is RentState) {
                   return RentFlutter();
+                } else if (navigationState is UserState) {
+                  return UserFlutter();
                 }
                 return const Center(child: Text('Unknown State'));
               },

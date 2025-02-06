@@ -2,6 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 enum NavigationEvents {
   DashboardClickedEvent,
+  UserClickedEvent,
   PublisherClickedEvent,
   RenterClickedEvent,
   BookClickedEvent,
@@ -11,6 +12,8 @@ enum NavigationEvents {
 abstract class NavigationStates {}
 
 class DashboardState extends NavigationStates {}
+
+class UserState extends NavigationStates {}
 
 class PublisherState extends NavigationStates {}
 
@@ -33,7 +36,9 @@ class NavigationBloc extends Bloc<NavigationEvents, NavigationStates> {
         emit(BookState());
       } else if (event == NavigationEvents.RentClickedEvent) {
         emit(RentState());
-      }
+      } else if (event == NavigationEvents.UserClickedEvent) {
+        emit(UserState());
+      } 
     });
   }
 }

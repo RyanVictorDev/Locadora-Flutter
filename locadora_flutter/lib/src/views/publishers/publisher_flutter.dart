@@ -151,6 +151,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                   IconButton(
                                     icon: Icon(Icons.visibility,
                                         color: Colors.blueAccent),
+                                    tooltip: 'Ver mais',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -164,6 +165,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
+                                    tooltip: 'Editar',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -176,6 +178,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Excluir',
                                     onPressed: () {
                                       _showDeleteConfirmationDialog(
                                           context, publisher.id);

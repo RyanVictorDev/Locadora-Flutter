@@ -159,6 +159,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                   IconButton(
                                     icon: Icon(Icons.visibility,
                                         color: Colors.blueAccent),
+                                    tooltip: 'Ver mais',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -171,6 +172,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
+                                    tooltip: 'Editar',
                                     onPressed: () {
                                       Navigator.push(
                                         context,
@@ -183,6 +185,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                   ),
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
+                                    tooltip: 'Excluir',
                                     onPressed: () {
                                       _showDeleteConfirmationDialog(
                                           context, renter.id);
