@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/models/user_model.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/user_service.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
 import 'package:locadora_flutter/src/views/user/user_create.dart';
 import 'package:locadora_flutter/src/views/user/user_details.dart';
 import 'package:locadora_flutter/src/views/user/user_update.dart';

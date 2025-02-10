@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/sidebar/sidebar_layout.dart';
-import 'package:locadora_flutter/src/views/dashboard_flutter.dart';
 import 'package:locadora_flutter/src/api/api.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
-import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 
 void main() {
   runApp(const MyApp());
