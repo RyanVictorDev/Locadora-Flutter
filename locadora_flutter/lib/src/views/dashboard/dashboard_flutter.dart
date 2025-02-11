@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:locadora_flutter/src/models/more_rented_book_model.dart';
@@ -103,7 +102,29 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
                             sideTitles: SideTitles(showTitles: true),
                           ),
                           bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
+                            sideTitles: SideTitles(
+                              showTitles: true,
+                              getTitlesWidget: (value, meta) {
+                                List<String> labels = [
+                                  "Total de Aluguéis",
+                                  "Atrasados",
+                                  "No Prazo",
+                                  "Com Atraso"
+                                ];
+
+                                return SideTitleWidget(
+                                  space: 10,
+                                  meta: meta,
+                                  child: Text(
+                                    labels[value.toInt()],
+                                    style: TextStyle(fontSize: 12),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                );
+                              },
+                              reservedSize:
+                                  60,
+                            ),
                           ),
                         ),
                         borderData: FlBorderData(show: false),
@@ -139,7 +160,7 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
                                   value: (book.totalRents / total) * 100,
                                   title: "${book.name}: ${book.totalRents}",
                                   radius: 50,
-                                  color: Colors.primaries[
+                                  color: Colors.accents[
                                       booksData.indexOf(book) %
                                           Colors.primaries.length],
                                 );
