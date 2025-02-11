@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
-import 'package:locadora_flutter/src/models/book_model.dart';
 import 'package:locadora_flutter/src/models/more_rented_book_model.dart';
+import 'package:locadora_flutter/src/models/rents_per_renters_model.dart';
 import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -93,23 +93,33 @@ class DashboardService {
     }
   }
 
-Future<List<MoreRentedBookModel>> getMostRentedBooks({required int numberOfMonths}) async {
-  try {
-    final apiService = ApiService();
-    final response = await apiService.fetchData('/dashboard/bookMoreRented?numberOfMonths=$numberOfMonths');
+  Future<List<MoreRentedBookModel>> getMostRentedBooks({required int numberOfMonths}) async {
+    try {
+      final apiService = ApiService();
+      final response = await apiService.fetchData('/dashboard/bookMoreRented?numberOfMonths=$numberOfMonths');
 
-    print("Resposta da API: ${response.body}");
+      print("Resposta da API: ${response.body}");
 
-    final dynamic jsonData = jsonDecode(response.body);
+      final dynamic jsonData = jsonDecode(response.body);
 
-    if (jsonData is List) {
-      return MoreRentedBookModel.fromJsonList(response.body);
+      if (jsonData is List) {
+        return MoreRentedBookModel.fromJsonList(response.body);
+      }
+
+      throw Exception("Formato inesperado da resposta: $jsonData");
+    } catch (e) {
+      print("Erro ao obter livros mais alugados: $e");
+      return []; 
     }
-
-    throw Exception("Formato inesperado da resposta: $jsonData");
-  } catch (e) {
-    print("Erro ao obter livros mais alugados: $e");
-    return []; 
   }
-}
+
+  Future<List<RentsPerRentersModel>> fetchRentsPerRenters(int page) async {
+    final apiService = ApiService();
+    final response = await apiService.fetchData('/dashboard/rentsPerRenter?page=$page');
+
+    final Map<String, dynamic> jsonData = jsonDecode(response.body);
+    final List<dynamic> content = jsonData["content"];
+
+    return content.map((value) => RentsPerRentersModel.fromJson(value)).toList();
+  }
 }
