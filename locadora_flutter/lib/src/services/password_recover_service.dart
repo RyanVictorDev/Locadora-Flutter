@@ -1,17 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
 import 'dart:convert';
 
-import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-class UserService {
+class PasswordRecoverService {
   static const String baseURL =
       'https://locadora-ryan-back.altislabtech.com.br';
 
-Future<void> createUser({
+  Future<void> createUser({
     required String name,
     required String email,
     required String password,
@@ -37,26 +35,15 @@ Future<void> createUser({
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 201) {
-        print("Usuário criado com sucesso!");
+        print("Usuario criado com sucesso!");
       } else {
-        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
-        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
-
-        throw errorMessage; 
+        print(
+            'Erro ao criar usuario: ${response.statusCode} - ${response.body}');
       }
     } catch (e) {
-      if (e is http.ClientException) {
-        throw "Erro de conexão: ${e.message}";
-      } else if (e is FormatException) {
-        throw "Erro ao processar resposta do servidor.";
-      } else if (e is String) {
-        throw e;
-      } else {
-        throw "Erro inesperado: ${e.toString()}"; 
-      }
+      throw Exception('Erro na requisição POST: $e');
     }
   }
-
 
   Future<List<UserModel>> fetchUsers(String search, int page) async {
     final apiService = ApiService();
@@ -142,5 +129,5 @@ Future<void> createUser({
     } catch (e) {
       throw Exception('Erro na requisição POST: $e');
     }
-  } 
+  }
 }

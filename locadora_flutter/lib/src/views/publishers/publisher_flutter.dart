@@ -52,8 +52,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
             TextButton(
               onPressed: () async {
                 Navigator.of(context).pop();
-                await PublisherService()
-                    .deletePublisher(id: id, context: context);
+                await PublisherService().deletePublisher(id: id, context: context);
                 _loadPublishers();
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
@@ -88,7 +87,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => PublisherCreate()),
-                    );
+                    ).then((value) => _loadPublishers());
                   },
                   child: Text('Registrar'),
                 ),
@@ -173,7 +172,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                           builder: (context) =>
                                               PublisherUpdate(id: publisher.id),
                                         ),
-                                      );
+                                      ).then((value) => _loadPublishers());
                                     },
                                   ),
                                   IconButton(

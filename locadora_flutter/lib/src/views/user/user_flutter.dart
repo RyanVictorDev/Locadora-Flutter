@@ -59,7 +59,7 @@ class _UserFlutterState extends State<UserFlutter> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => UserCreate()),
-                    );
+                    ).then((value) => _loadUsers());
                   },
                   child: Text('Registrar'),
                 ),
@@ -145,7 +145,7 @@ class _UserFlutterState extends State<UserFlutter> {
                                           builder: (context) =>
                                               UserUpdate(id: user.id),
                                         ),
-                                      );
+                                      ).then((value) => _loadUsers());
                                     },
                                   ),
                                 ],

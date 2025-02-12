@@ -81,7 +81,7 @@ class _RentFlutterState extends State<RentFlutter> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => RentCreate()),
-                    );
+                    ).then((value) => _loadRents());
                   },
                   child: Text('Registrar'),
                 ),
@@ -168,7 +168,7 @@ class _RentFlutterState extends State<RentFlutter> {
                                           builder: (context) =>
                                               RentUpdate(id: rent.id),
                                         ),
-                                      );
+                                      ).then((value) => _loadRents());
                                     },
                                   ),
                                 ],

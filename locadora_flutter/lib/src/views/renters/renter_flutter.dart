@@ -95,7 +95,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => RenterCreate()),
-                    );
+                    ).then((value) => _loadRenters());
                   },
                   child: Text('Registrar'),
                 ),
@@ -180,7 +180,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                           builder: (context) =>
                                               RenterUpdate(id: renter.id),
                                         ),
-                                      );
+                                      ).then((value) => _loadRenters());
                                     },
                                   ),
                                   IconButton(

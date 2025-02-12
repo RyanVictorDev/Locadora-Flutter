@@ -16,11 +16,18 @@ class _UserCreateState extends State<UserCreate> {
   final TextEditingController _passwordController = TextEditingController();
 
   String _selectedRole = 'USER';
+  bool _isLoading = false;
 
   final UserService _userService = UserService();
 
-  Future<void> _submitForm() async {
+Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final email = _emailController.text;
       final password = _passwordController.text;
@@ -34,17 +41,45 @@ class _UserCreateState extends State<UserCreate> {
           role: role,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuário criado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar usuário: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -144,8 +179,12 @@ class _UserCreateState extends State<UserCreate> {
                     backgroundColor: const Color.fromARGB(255, 0, 124, 87),
                     foregroundColor: Colors.white,
                   ),
-                  onPressed: _submitForm,
-                  child: const Text('Salvar'),
+                  onPressed: _isLoading
+                      ? null
+                      : _submitForm,
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Salvar'),
                 ),
               ),
             ],

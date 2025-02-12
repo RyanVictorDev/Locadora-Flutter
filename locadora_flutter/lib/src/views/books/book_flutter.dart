@@ -84,7 +84,7 @@ class _BookFlutterState extends State<BookFlutter> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => BookCreate()),
-                    );
+                    ).then((value) => _loadBooks());
                   },
                   child: Text('Registrar'),
                 ),
@@ -167,7 +167,7 @@ class _BookFlutterState extends State<BookFlutter> {
                                         MaterialPageRoute(
                                             builder: (context) =>
                                                 BookUpdate(id: book.id)),
-                                      );
+                                      ).then((value) => _loadBooks());
                                     },
                                   ),
                                   IconButton(
