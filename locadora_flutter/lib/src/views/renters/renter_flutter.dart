@@ -25,16 +25,6 @@ class _RenterFlutterState extends State<RenterFlutter> {
     _loadRenters();
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? Colors.red : Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
-
   void _loadRenters() {
     setState(() {
       rentersFuture = RenterService().fetchRenters(search, page);

@@ -225,8 +225,15 @@ class _RentFlutterState extends State<RentFlutter> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                await RentService().deliveryRent(id: id, context: context);
+                try {
+                  await RentService().deliveryRent(id: id, context: context);
+                  Navigator.of(context).pop();
+                  _loadRents();
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())),
+                  );
+                }
               },
               child: Text("Entregar", style: TextStyle(color: Colors.red)),
             ),
