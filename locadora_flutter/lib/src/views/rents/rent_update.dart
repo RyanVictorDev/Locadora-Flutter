@@ -37,7 +37,7 @@ class _RentUpdateState extends State<RentUpdate> {
       final rent = await _rentService.getById(id: widget.id);
       if (rent != null) {
         setState(() {
-          _deadLineController.text = rent.deadLine;
+          _deadLineController.text = DateFormat("dd/MM/yyyy").format(DateFormat("yyyy-MM-dd").parse(rent.deadLine));
           _selectedRenter = rent.renter;
           _selectedBook = rent.book;
           _isLoading = false;

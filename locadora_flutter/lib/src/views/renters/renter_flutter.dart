@@ -240,9 +240,16 @@ class _RenterFlutterState extends State<RenterFlutter> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                await RenterService().deleteRenter(id: id, context: context);
-                _loadRenters();
+                try {
+                  await RenterService().deleteRenter(id: id, context: context);
+                  Navigator.of(context).pop();
+                  _loadRenters();
+                } catch (e) {
+                    Navigator.of(context).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())),
+                  );
+                }
+
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),

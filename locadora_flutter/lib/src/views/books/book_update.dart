@@ -37,7 +37,7 @@ class _BookUpdateState extends State<BookUpdate> {
         setState(() {
           _nameController.text = book.name;
           _authorController.text = book.author;
-          _launchDateController.text = book.launchDate;
+          _launchDateController.text = DateFormat("dd/MM/yyyy").format(DateFormat("yyyy-MM-dd").parse(book.launchDate));
           _totalQuantityController.text = book.totalQuantity.toString();
           _selectedPublisher = book.publisher;
           _isLoading = false;

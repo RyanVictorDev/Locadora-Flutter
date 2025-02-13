@@ -51,9 +51,14 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                await PublisherService().deletePublisher(id: id, context: context);
-                _loadPublishers();
+                try {
+                  await PublisherService().deletePublisher(id: id, context: context);
+                  Navigator.of(context).pop();
+                  _loadPublishers();
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+                }
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),

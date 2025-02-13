@@ -49,9 +49,14 @@ class _BookFlutterState extends State<BookFlutter> {
             ),
             TextButton(
               onPressed: () async {
-                Navigator.of(context).pop();
-                await BookService().deleteBook(id: id, context: context);
-                _loadBooks();
+                try {
+                  await BookService().deleteBook(id: id, context: context);
+                  Navigator.of(context).pop();
+                  _loadBooks();
+                } catch (e) {
+                  Navigator.of(context).pop();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())),);
+                }
               },
               child: Text("Excluir", style: TextStyle(color: Colors.red)),
             ),
