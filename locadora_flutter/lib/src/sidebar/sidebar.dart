@@ -13,6 +13,8 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
+  String name = '';
+  String email = '';
   late final AnimationController _animationController;
   late final StreamController<bool> isSidebarOpenedStreamController;
   late final Stream<bool> isSidebarOpenedStream;
@@ -27,6 +29,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
     );
     isSidebarOpenedStreamController = StreamController<bool>.broadcast();
     isSidebarOpenedStream = isSidebarOpenedStreamController.stream;
+    _loadNameAndEmail();
   }
 
   @override
@@ -48,6 +51,15 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
       _animationController.forward();
     }
   }
+
+  Future<void> _loadNameAndEmail() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      name = prefs.getString('name') ?? 'Usuário';
+      email = prefs.getString('email') ?? 'user@gmail.com';
+    });
+  }
+
 
   Future<void> logoutFunction(BuildContext context) async {
     try {
@@ -90,19 +102,19 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                     children: <Widget>[
                       const SizedBox(height: 100),
                       ListTile(
-                        title: const Text(
-                          'TESTANDO',
+                        title: Text(
+                          name,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 30,
+                            fontSize: 40,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: const Text(
-                          'TESTANDO@gmail.com',
+                        subtitle: Text(
+                          email,
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 20,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

@@ -55,6 +55,12 @@ class _RentUpdateState extends State<RentUpdate> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final rawLaunchDate = _deadLineController.text;
       final renterId = _selectedRenter?.id;
       final bookId = _selectedBook?.id;
@@ -84,17 +90,44 @@ class _RentUpdateState extends State<RentUpdate> {
           deadLine: formattedDate,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Aluguel atualizado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar aluguel: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<List<RenterModel>> _fetchRenters(String filter) async {

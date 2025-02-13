@@ -39,11 +39,21 @@ class RentService {
       if (response.statusCode == 201) {
         print("Aluguel criado com sucesso!");
       } else {
-        print(
-            'Erro ao criar aluguel: ${response.statusCode} - ${response.body} - $body');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
@@ -113,15 +123,25 @@ class RentService {
       if (response.statusCode == 200) {
         print("Aluguel editado com sucesso!");
       } else {
-        print(
-            'Erro ao editar aluguel: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
-  Future<bool> deliveryRent(
+  Future<void> deliveryRent(
       {required int id, required BuildContext context}) async {
     final url = Uri.parse('$baseURL/rent/$id');
     final prefs = await SharedPreferences.getInstance();
@@ -136,30 +156,23 @@ class RentService {
       final response = await http.put(url, headers: headers);
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Aluguel devolvido com sucesso!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        return true;
+        print("Aluguel entregue com sucesso!");
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao devolver: ${response.body}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return false;
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro na requisição: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 }

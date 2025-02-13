@@ -55,6 +55,12 @@ class _BookUpdateState extends State<BookUpdate> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final author = _authorController.text;
       final totalQuantity = int.tryParse(_totalQuantityController.text) ?? 0;
@@ -81,17 +87,44 @@ class _BookUpdateState extends State<BookUpdate> {
           publisherId: publisherId,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Livro atualizado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar livro: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<List<PublisherModel>> _fetchPublishers(String filter) async {

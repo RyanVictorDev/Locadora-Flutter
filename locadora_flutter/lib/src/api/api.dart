@@ -22,11 +22,15 @@ class ApiService {
         final data = jsonDecode(response.body);
         final token = data['token'];
         final role = data['role'];
+        final name = data['name'];
+        final email = data['email'];
 
         if (token != null) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('authToken', token);
           await prefs.setString('role', role);
+          await prefs.setString('name', name);
+          await prefs.setString('email', email);
         }
       } else {
         throw Exception(

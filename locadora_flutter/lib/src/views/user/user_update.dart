@@ -48,6 +48,12 @@ class _UserUpdateState extends State<UserUpdate> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final email = _emailController.text;
       final role = _selectedRole;
@@ -60,17 +66,44 @@ class _UserUpdateState extends State<UserUpdate> {
           role: role,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuário atualizado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar usuário: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

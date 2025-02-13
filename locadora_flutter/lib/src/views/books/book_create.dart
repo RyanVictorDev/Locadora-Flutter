@@ -20,6 +20,8 @@ class _BookCreateState extends State<BookCreate> {
   final MaskedTextController _launchDateController = MaskedTextController(mask: '00/00/0000');
   final TextEditingController _totalQuantityController = TextEditingController();
 
+  bool _isLoading = false;
+
   final BookService _bookService = BookService();
   final PublisherService _publisherService = PublisherService();
 
@@ -27,6 +29,12 @@ class _BookCreateState extends State<BookCreate> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final author = _authorController.text;
       final totalQuantity = int.tryParse(_totalQuantityController.text) ?? 0;
@@ -52,17 +60,44 @@ class _BookCreateState extends State<BookCreate> {
           publisherId: publisherId,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Livro criado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar livro: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<List<PublisherModel>> _fetchPublishers(String filter) async {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 
 class PublisherCreate extends StatefulWidget {
   const PublisherCreate({super.key});
@@ -18,10 +17,18 @@ class _PublisherCreateState extends State<PublisherCreate> {
   final TextEditingController _telephoneController = MaskedTextController(mask: '(00)00000-0000');
   final TextEditingController _siteController = TextEditingController();
 
+  bool _isLoading = false;
+
   final PublisherService _publisherService = PublisherService();
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final email = _emailController.text;
       final telephone = _telephoneController.text; 
@@ -35,17 +42,44 @@ class _PublisherCreateState extends State<PublisherCreate> {
           site: site,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Publisher criado com sucesso!')),
+          const SnackBar(content: Text('Editora criado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar publisher: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

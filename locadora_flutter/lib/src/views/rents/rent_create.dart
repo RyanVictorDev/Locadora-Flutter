@@ -3,10 +3,8 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 import 'package:locadora_flutter/src/models/book_model.dart';
-import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/models/renter_model.dart';
 import 'package:locadora_flutter/src/services/book_service.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/rent_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
 
@@ -21,6 +19,8 @@ class _RentCreateState extends State<RentCreate> {
   final _formKey = GlobalKey<FormState>();
   final MaskedTextController _deadLineController = MaskedTextController(mask: '00/00/0000');
 
+  bool _isLoading = false;
+
   final BookService _bookService = BookService();
   final RenterService _renterService = RenterService();
   final RentService _rentService = RentService();
@@ -29,6 +29,12 @@ class _RentCreateState extends State<RentCreate> {
   BookModel? _selectedBook;
 
   Future<void> _submitForm() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    _showLoadingDialog();
+
     if (_formKey.currentState!.validate()) {
       final rawLaunchDate = _deadLineController.text;
       final renterId = _selectedRenter?.id;
@@ -58,17 +64,44 @@ class _RentCreateState extends State<RentCreate> {
           deadLine: formattedDate,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Aluguel criado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar aluguel: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   Future<List<RenterModel>> _fetchRenters(String filter) async {

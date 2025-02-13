@@ -38,13 +38,23 @@ class RenterService {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 201) {
-        print("Locatario criado com sucesso!");
+        print("Locatário criado com sucesso!");
       } else {
-        print(
-            'Erro ao criar locatario: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
@@ -129,16 +139,27 @@ class RenterService {
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        print("Locatario editado com sucesso!");
+        print("Locatário editado com sucesso!");
       } else {
-        print('Erro ao editar locatario: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
-  Future<bool> deleteRenter(
+  Future<void> deleteRenter(
       {required int id, required BuildContext context}) async {
     final url = Uri.parse('$baseURL/renter/$id');
     final prefs = await SharedPreferences.getInstance();
@@ -153,30 +174,23 @@ class RenterService {
       final response = await http.delete(url, headers: headers);
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Locatario excluído com sucesso!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        return true;
+        print("Locatário deletado com sucesso!");
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao excluir: ${response.body}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return false;
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro na requisição DELETE: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'package:locadora_flutter/src/models/publisher_model.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
 
 class RenterUpdate extends StatefulWidget {
@@ -55,6 +53,12 @@ class _RenterUpdateState extends State<RenterUpdate> {
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final email = _emailController.text;
       final telephone = _telephoneController.text;
@@ -71,17 +75,44 @@ class _RenterUpdateState extends State<RenterUpdate> {
           cpf: cpf,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Locatário atualizado com sucesso!')),
         );
 
         Navigator.pop(context);
+
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao atualizar locatário: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+    void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

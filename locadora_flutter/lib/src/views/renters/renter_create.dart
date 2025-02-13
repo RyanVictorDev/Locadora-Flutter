@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_masked_text2/flutter_masked_text2.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
-import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
 
 class RenterCreate extends StatefulWidget {
@@ -20,10 +18,18 @@ class _RenterCreateState extends State<RenterCreate> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cpfController = MaskedTextController(mask: '000.000.000-00');
 
+  bool _isLoading = false;
+
   final RenterService _renterService = RenterService();
 
   Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+
       final name = _nameController.text;
       final email = _emailController.text;
       final telephone = _telephoneController.text;
@@ -39,17 +45,44 @@ class _RenterCreateState extends State<RenterCreate> {
           cpf: cpf,
         );
 
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Locatario criado com sucesso!')),
         );
 
         Navigator.pop(context);
+        
       } catch (e) {
+        Navigator.of(context).pop();
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao criar locatario: $e')),
+          SnackBar(content: Text(e.toString())),
         );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return AlertDialog(
+          content: Row(
+            children: const [
+              CircularProgressIndicator(),
+              SizedBox(width: 16),
+              Text("Criando usuário..."),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override

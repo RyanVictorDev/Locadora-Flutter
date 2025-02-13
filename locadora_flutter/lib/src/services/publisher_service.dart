@@ -35,13 +35,23 @@ class PublisherService {
       final response = await http.post(url, headers: headers, body: body);
 
       if (response.statusCode == 201) {
-        print("Publisher criado com sucesso!");
+        print("Editora criada com sucesso!");
       } else {
-        print(
-            'Erro ao criar publisher: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
@@ -124,15 +134,25 @@ class PublisherService {
       if (response.statusCode == 200) {
         print("Editora editada com sucesso!");
       } else {
-        print(
-            'Erro ao editar editora: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 
-  Future<bool> deletePublisher(
+  Future<void> deletePublisher(
       {required int id, required BuildContext context}) async {
     final url = Uri.parse('$baseURL/publisher/$id');
     final prefs = await SharedPreferences.getInstance();
@@ -147,30 +167,23 @@ class PublisherService {
       final response = await http.delete(url, headers: headers);
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Editora excluída com sucesso!"),
-            backgroundColor: Colors.green,
-          ),
-        );
-        return true;
+        print("Editora deletada com sucesso!");
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao excluir: ${response.body}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return false;
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage;
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro na requisição DELETE: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return false;
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}";
+      }
     }
   }
 

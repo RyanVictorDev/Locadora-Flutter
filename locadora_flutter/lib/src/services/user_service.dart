@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
 import 'dart:convert';
 
-import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -134,13 +133,23 @@ Future<void> createUser({
       final response = await http.put(url, headers: headers, body: body);
 
       if (response.statusCode == 200) {
-        print("Usuario editada com sucesso!");
+        print("Usuário editado com sucesso!");
       } else {
-        print(
-            'Erro ao editar usuario: ${response.statusCode} - ${response.body}');
+        final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
+        final errorMessage = responseBody['error'] ?? 'Erro desconhecido';
+
+        throw errorMessage; 
       }
     } catch (e) {
-      throw Exception('Erro na requisição POST: $e');
+      if (e is http.ClientException) {
+        throw "Erro de conexão: ${e.message}";
+      } else if (e is FormatException) {
+        throw "Erro ao processar resposta do servidor.";
+      } else if (e is String) {
+        throw e;
+      } else {
+        throw "Erro inesperado: ${e.toString()}"; 
+      }
     }
-  } 
+  }
 }
