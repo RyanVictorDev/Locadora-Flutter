@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/main.dart';
 import 'package:locadora_flutter/src/services/password_recover_service.dart';
-import 'package:locadora_flutter/src/views/password%20recover/newpassword_flutter.dart';
 
-class PasswordRecoveryFlutter extends StatefulWidget {
-  const PasswordRecoveryFlutter({super.key});
+class NewpasswordFlutter extends StatefulWidget {
+  const NewpasswordFlutter({super.key});
 
   @override
-  State<PasswordRecoveryFlutter> createState() =>
-      _PasswordRecoveryFlutterState();
+  State<NewpasswordFlutter> createState() =>
+      _NewpasswordFlutterState();
 }
 
-class _PasswordRecoveryFlutterState extends State<PasswordRecoveryFlutter> {
+class _NewpasswordFlutterState extends State<NewpasswordFlutter> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _tokenController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
   final PasswordRecoverService _passwordRecoverService =
       PasswordRecoverService();
 
@@ -28,22 +29,23 @@ class _PasswordRecoveryFlutterState extends State<PasswordRecoveryFlutter> {
     });
 
     try {
-      await _passwordRecoverService.emailSend(email: _emailController.text);
+      await _passwordRecoverService.resetPassword(Token: _tokenController.text, newPassword: _newPasswordController.text);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('E-mail de recuperação enviado!')),
-        );
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const NewpasswordFlutter()),
+          const SnackBar(content: Text('Senha alterada com sucesso!')),
         );
       }
     } catch (e) {
       setState(() => _errorMessage = e.toString());
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
       );
     } finally {
       setState(() => _isLoading = false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+      );
     }
   }
 
@@ -65,11 +67,19 @@ class _PasswordRecoveryFlutterState extends State<PasswordRecoveryFlutter> {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'Email'),
-                keyboardType: TextInputType.emailAddress,
-                validator: (value) =>
-                    value?.isEmpty ?? true ? 'Insira seu email' : null,
+                controller: _tokenController,
+                decoration: const InputDecoration(labelText: 'Token'),
+              ),
+              const SizedBox(height: 24),
+              if (_errorMessage != null)
+                Text(
+                  _errorMessage!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              const SizedBox(height: 16),
+              TextFormField(
+                controller: _newPasswordController,
+                decoration: const InputDecoration(labelText: 'Nova Senha'),
               ),
               const SizedBox(height: 24),
               if (_errorMessage != null)
@@ -86,7 +96,7 @@ class _PasswordRecoveryFlutterState extends State<PasswordRecoveryFlutter> {
                 ),
                 child: _isLoading
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Recuperar Senha'),
+                    : const Text('Redefinir Senha'),
               ),
             ],
           ),

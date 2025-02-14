@@ -167,7 +167,7 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
                               sections: booksData.map((book) {
                                 return PieChartSectionData(
                                   value: (book.totalRents / total) * 100,
-                                  title: "${book.name}: ${book.totalRents}",
+                                  title: "${book.name}: ${book.totalRents}", titleStyle: TextStyle(fontWeight: FontWeight.bold),
                                   radius: 50,
                                   color: Colors.accents[
                                       booksData.indexOf(book) %

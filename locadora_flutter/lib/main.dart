@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/sidebar/sidebar_layout.dart';
 import 'package:locadora_flutter/src/api/api.dart';
+import 'package:locadora_flutter/src/views/password%20recover/password_recovery_flutter.dart';
 
 void main() {
   runApp(const MyApp());
@@ -65,6 +66,13 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> PasswordRecoverPage() async {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const PasswordRecoveryFlutter()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
 
               TextButton(
-                onPressed: _isLoading ? null : () {},
+                onPressed: _isLoading ? null : PasswordRecoverPage,
                 child: const Text('Esqueci minha senha'),
               ),
             ],
