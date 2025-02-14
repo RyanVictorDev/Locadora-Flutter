@@ -3,6 +3,7 @@ import 'package:locadora_flutter/src/models/rent_model.dart';
 import 'package:locadora_flutter/src/services/rent_service.dart';
 import 'package:locadora_flutter/src/views/rents/rent_create.dart';
 import 'package:locadora_flutter/src/views/rents/rent_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RentFlutter extends StatefulWidget {
   @override
@@ -10,6 +11,7 @@ class RentFlutter extends StatefulWidget {
 }
 
 class _RentFlutterState extends State<RentFlutter> {
+  String role = '';
   late Future<List<RentModel>> rentsFuture;
   int page = 0;
   String search = "";
@@ -25,6 +27,13 @@ class _RentFlutterState extends State<RentFlutter> {
   void _loadRents() {
     setState(() {
       rentsFuture = RentService().fetchRents(search, page);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role = prefs.getString('role') ?? 'USER';
     });
   }
 
@@ -76,6 +85,7 @@ class _RentFlutterState extends State<RentFlutter> {
           children: [
             Row(
               children: [
+                if (role == 'ADMIN')
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -143,7 +153,7 @@ class _RentFlutterState extends State<RentFlutter> {
                             onTap: () => _toggleExpansion(index),
                           ),
                           if (expandedState[index] == true &&
-                              rent.status == 'RENTED' || rent.status == 'LATE')
+                              rent.status == 'RENTED' || rent.status == 'LATE' && role == 'ADMIN')
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),

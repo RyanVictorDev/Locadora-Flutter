@@ -4,6 +4,7 @@ import 'package:locadora_flutter/src/services/book_service.dart';
 import 'package:locadora_flutter/src/views/books/book_create.dart';
 import 'package:locadora_flutter/src/views/books/book_details.dart';
 import 'package:locadora_flutter/src/views/books/book_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class BookFlutter extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class BookFlutter extends StatefulWidget {
 }
 
 class _BookFlutterState extends State<BookFlutter> {
+  String role = '';
   late Future<List<BookModel>> booksFuture;
   int page = 0;
   String search = "";
@@ -26,6 +28,13 @@ class _BookFlutterState extends State<BookFlutter> {
   void _loadBooks() {
     setState(() {
       booksFuture = BookService().fetchBooks(search, page);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role = prefs.getString('role') ?? 'USER';
     });
   }
 
@@ -84,6 +93,7 @@ class _BookFlutterState extends State<BookFlutter> {
           children: [
             Row(
               children: [
+                if (role == 'ADMIN')
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -163,6 +173,7 @@ class _BookFlutterState extends State<BookFlutter> {
                                       );
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -175,6 +186,7 @@ class _BookFlutterState extends State<BookFlutter> {
                                       ).then((value) => _loadBooks());
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',

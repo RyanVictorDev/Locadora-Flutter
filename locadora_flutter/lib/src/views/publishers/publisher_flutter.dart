@@ -4,6 +4,7 @@ import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_details.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PublisherFlutter extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class PublisherFlutter extends StatefulWidget {
 }
 
 class _PublisherFlutterState extends State<PublisherFlutter> {
+  String role = '';
   late Future<List<PublisherModel>> publishersFuture;
   int page = 0;
   String search = "";
@@ -26,6 +28,13 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   void _loadPublishers() {
     setState(() {
       publishersFuture = PublisherService().fetchPublishers(search, page);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role = prefs.getString('role') ?? 'USER';
     });
   }
 
@@ -86,6 +95,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
           children: [
             Row(
               children: [
+                if (role == 'ADMIN')
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -167,6 +177,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                       );
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -180,6 +191,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                       ).then((value) => _loadPublishers());
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',

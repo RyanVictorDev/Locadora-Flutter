@@ -4,6 +4,7 @@ import 'package:locadora_flutter/src/services/user_service.dart';
 import 'package:locadora_flutter/src/views/user/user_create.dart';
 import 'package:locadora_flutter/src/views/user/user_details.dart';
 import 'package:locadora_flutter/src/views/user/user_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserFlutter extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class UserFlutter extends StatefulWidget {
 }
 
 class _UserFlutterState extends State<UserFlutter> {
+  String role = '';
   late Future<List<UserModel>> usersFuture;
   int page = 0;
   String search = "";
@@ -26,6 +28,13 @@ class _UserFlutterState extends State<UserFlutter> {
   void _loadUsers() {
     setState(() {
       usersFuture = UserService().fetchUsers(search, page);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role = prefs.getString('role') ?? 'USER';
     });
   }
 
@@ -53,6 +62,7 @@ class _UserFlutterState extends State<UserFlutter> {
           children: [
             Row(
               children: [
+                if (role == 'ADMIN')
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -135,6 +145,7 @@ class _UserFlutterState extends State<UserFlutter> {
                                       );
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',

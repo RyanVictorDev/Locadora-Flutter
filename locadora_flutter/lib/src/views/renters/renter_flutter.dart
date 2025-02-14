@@ -6,6 +6,7 @@ import 'package:locadora_flutter/src/services/renter_service.dart';
 import 'package:locadora_flutter/src/views/renters/renter_create.dart';
 import 'package:locadora_flutter/src/views/renters/renter_details.dart';
 import 'package:locadora_flutter/src/views/renters/renter_update.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RenterFlutter extends StatefulWidget {
   @override
@@ -13,6 +14,7 @@ class RenterFlutter extends StatefulWidget {
 }
 
 class _RenterFlutterState extends State<RenterFlutter> {
+  String role = '';
   late Future<List<RenterModel>> rentersFuture;
   int page = 0;
   String search = "";
@@ -28,6 +30,13 @@ class _RenterFlutterState extends State<RenterFlutter> {
   void _loadRenters() {
     setState(() {
       rentersFuture = RenterService().fetchRenters(search, page);
+    });
+  }
+
+  Future<void> _loadRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      role = prefs.getString('role') ?? 'USER';
     });
   }
 
@@ -80,6 +89,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
           children: [
             Row(
               children: [
+                if (role == 'ADMIN')
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -160,6 +170,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                       );
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -173,6 +184,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                       ).then((value) => _loadRenters());
                                     },
                                   ),
+                                  if (role == 'ADMIN')
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',
