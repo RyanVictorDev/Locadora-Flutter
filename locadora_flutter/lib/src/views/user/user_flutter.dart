@@ -23,6 +23,7 @@ class _UserFlutterState extends State<UserFlutter> {
   void initState() {
     super.initState();
     _loadUsers();
+    _loadRole();
   }
 
   void _loadUsers() {

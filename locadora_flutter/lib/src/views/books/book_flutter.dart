@@ -23,6 +23,7 @@ class _BookFlutterState extends State<BookFlutter> {
   void initState() {
     super.initState();
     _loadBooks();
+    _loadRole();
   }
 
   void _loadBooks() {

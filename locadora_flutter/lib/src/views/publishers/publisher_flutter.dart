@@ -23,6 +23,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   void initState() {
     super.initState();
     _loadPublishers();
+    _loadRole();
   }
 
   void _loadPublishers() {

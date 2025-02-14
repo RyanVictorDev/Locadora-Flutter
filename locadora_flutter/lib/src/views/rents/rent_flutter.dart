@@ -22,6 +22,7 @@ class _RentFlutterState extends State<RentFlutter> {
   void initState() {
     super.initState();
     _loadRents();
+    _loadRole();
   }
 
   void _loadRents() {
