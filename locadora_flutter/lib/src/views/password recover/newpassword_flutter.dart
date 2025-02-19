@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/main.dart';
 import 'package:locadora_flutter/src/services/password_recover_service.dart';
+import 'package:locadora_flutter/src/views/login/login_flutter.dart';
 
 class NewpasswordFlutter extends StatefulWidget {
   const NewpasswordFlutter({super.key});

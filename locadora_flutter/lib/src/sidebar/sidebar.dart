@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:locadora_flutter/main.dart';
 import 'package:locadora_flutter/src/bloc.navigation_bloc/navigation_bloc.dart';
-import 'package:locadora_flutter/src/sidebar/menu_item.dart';
+import 'package:locadora_flutter/src/components/menu_item.dart';
+import 'package:locadora_flutter/src/views/login/login_flutter.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -176,13 +177,7 @@ class _SidebarState extends State<Sidebar> with SingleTickerProviderStateMixin {
                           BlocProvider.of<NavigationBloc>(context).add(NavigationEvents.RentClickedEvent);
                         },
                       ),
-                      Divider(
-                        height: 304,
-                        thickness: 0.5,
-                        color: Colors.white.withOpacity(0),
-                        indent: 32,
-                        endIndent: 32,
-                      ),
+                      Spacer(),
                       MenuItem(
                         icon: Icons.exit_to_app,
                         title: 'Logout',

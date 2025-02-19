@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
 import 'package:locadora_flutter/src/models/more_rented_book_model.dart';
 import 'package:locadora_flutter/src/models/rents_per_renters_model.dart';
 import 'package:locadora_flutter/src/services/dashboard_service.dart';
@@ -49,13 +50,7 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Dashboard',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Dashboard'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),

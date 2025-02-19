@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/rent_model.dart';
 import 'package:locadora_flutter/src/services/rent_service.dart';
 import 'package:locadora_flutter/src/views/rents/rent_create.dart';
@@ -34,7 +36,7 @@ class _RentFlutterState extends State<RentFlutter> {
   Future<void> _loadRole() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      role = prefs.getString('role') ?? 'USER';
+      role = prefs.getString('role') ?? EnumRole.USER.name;
     });
   }
 
@@ -72,13 +74,7 @@ class _RentFlutterState extends State<RentFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Alugueis',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Alugueis')
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -86,7 +82,7 @@ class _RentFlutterState extends State<RentFlutter> {
           children: [
             Row(
               children: [
-                if (role == 'ADMIN')
+                if (role == EnumRole.ADMIN.name)
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -154,7 +150,7 @@ class _RentFlutterState extends State<RentFlutter> {
                             onTap: () => _toggleExpansion(index),
                           ),
                           if (expandedState[index] == true &&
-                              rent.status == 'RENTED' || rent.status == 'LATE' && role == 'ADMIN')
+                              rent.status == 'RENTED' || rent.status == 'LATE' && role == EnumRole.ADMIN.name)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),

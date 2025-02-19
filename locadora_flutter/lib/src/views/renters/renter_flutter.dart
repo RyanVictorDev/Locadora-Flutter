@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:locadora_flutter/src/api/api.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/renter_model.dart';
 import 'package:locadora_flutter/src/services/renter_service.dart';
 import 'package:locadora_flutter/src/views/renters/renter_create.dart';
@@ -37,7 +39,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
   Future<void> _loadRole() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      role = prefs.getString('role') ?? 'USER';
+      role = prefs.getString('role') ?? EnumRole.USER.name;
     });
   }
 
@@ -76,13 +78,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(0, 0, 83, 94),
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Locatários',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Locatários'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -90,7 +86,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
           children: [
             Row(
               children: [
-                if (role == 'ADMIN')
+                if (role == EnumRole.ADMIN.name)
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -171,7 +167,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                       );
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -185,7 +181,7 @@ class _RenterFlutterState extends State<RenterFlutter> {
                                       ).then((value) => _loadRenters());
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',

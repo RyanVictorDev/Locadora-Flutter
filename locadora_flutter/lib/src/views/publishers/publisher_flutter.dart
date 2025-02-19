@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/components/publisher_components.dart';
+import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/publisher_model.dart';
 import 'package:locadora_flutter/src/services/publisher_service.dart';
 import 'package:locadora_flutter/src/views/publishers/publisher_create.dart';
@@ -35,7 +38,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   Future<void> _loadRole() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      role = prefs.getString('role') ?? 'USER';
+      role = prefs.getString('role') ?? EnumRole.USER.name;
     });
   }
 
@@ -45,34 +48,13 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
     });
   }
 
-  void _showDeleteConfirmationDialog(BuildContext context, int id) {
+void _showDeleteConfirmationDialog(BuildContext context, int id) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text("Confirmar Exclusão"),
-          content: Text("Tem certeza de que deseja excluir esta editora?"),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text("Cancelar"),
-            ),
-            TextButton(
-              onPressed: () async {
-                try {
-                  await PublisherService().deletePublisher(id: id, context: context);
-                  Navigator.of(context).pop();
-                  _loadPublishers();
-                } catch (e) {
-                  Navigator.of(context).pop();
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
-                }
-              },
-              child: Text("Excluir", style: TextStyle(color: Colors.red)),
-            ),
-          ],
+        return DeleteDialog(
+          id: id,
+          onDeleteSuccess: _loadPublishers,
         );
       },
     );
@@ -82,13 +64,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Editoras',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Editoras')
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -96,7 +72,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
           children: [
             Row(
               children: [
-                if (role == 'ADMIN')
+                if (role == EnumRole.ADMIN.name)
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -178,7 +154,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                       );
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -192,7 +168,7 @@ class _PublisherFlutterState extends State<PublisherFlutter> {
                                       ).then((value) => _loadPublishers());
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/user_model.dart';
 import 'package:locadora_flutter/src/services/user_service.dart';
 import 'package:locadora_flutter/src/views/user/user_create.dart';
@@ -35,7 +37,7 @@ class _UserFlutterState extends State<UserFlutter> {
   Future<void> _loadRole() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      role = prefs.getString('role') ?? 'USER';
+      role = prefs.getString('role') ?? EnumRole.USER.name;
     });
   }
 
@@ -49,13 +51,7 @@ class _UserFlutterState extends State<UserFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Usuários',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Usuários')
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -63,7 +59,7 @@ class _UserFlutterState extends State<UserFlutter> {
           children: [
             Row(
               children: [
-                if (role == 'ADMIN')
+                if (role == EnumRole.ADMIN.name)
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -146,7 +142,7 @@ class _UserFlutterState extends State<UserFlutter> {
                                       );
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/book_model.dart';
+import 'package:locadora_flutter/src/models/user_model.dart';
 import 'package:locadora_flutter/src/services/book_service.dart';
 import 'package:locadora_flutter/src/views/books/book_create.dart';
 import 'package:locadora_flutter/src/views/books/book_details.dart';
@@ -35,7 +38,7 @@ class _BookFlutterState extends State<BookFlutter> {
   Future<void> _loadRole() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      role = prefs.getString('role') ?? 'USER';
+      role = prefs.getString('role') ?? EnumRole.USER.name;
     });
   }
 
@@ -80,13 +83,7 @@ class _BookFlutterState extends State<BookFlutter> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Padding(
-          padding: const EdgeInsets.only(left: 30.0),
-          child: Text(
-            'Livros',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
-          ),
-        ),
+        title: AppTitle(title: 'Livros')
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -94,7 +91,7 @@ class _BookFlutterState extends State<BookFlutter> {
           children: [
             Row(
               children: [
-                if (role == 'ADMIN')
+                if (role == EnumRole.ADMIN.name)
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -174,7 +171,7 @@ class _BookFlutterState extends State<BookFlutter> {
                                       );
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.edit, color: Colors.green),
                                     tooltip: 'Editar',
@@ -187,7 +184,7 @@ class _BookFlutterState extends State<BookFlutter> {
                                       ).then((value) => _loadBooks());
                                     },
                                   ),
-                                  if (role == 'ADMIN')
+                                  if (role == EnumRole.ADMIN.name)
                                   IconButton(
                                     icon: Icon(Icons.delete, color: Colors.red),
                                     tooltip: 'Excluir',
