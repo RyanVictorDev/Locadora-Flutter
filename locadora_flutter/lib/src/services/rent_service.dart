@@ -102,7 +102,7 @@ class RentService {
     required int bookId,
     required String deadLine,
   }) async {
-    final url = Uri.parse('$baseURL/rent/$id');
+    final url = Uri.parse('$baseURL/rent/update/$id');
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('authToken');
 

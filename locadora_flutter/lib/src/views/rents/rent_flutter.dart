@@ -149,8 +149,7 @@ class _RentFlutterState extends State<RentFlutter> {
                                 : Icons.expand_more),
                             onTap: () => _toggleExpansion(index),
                           ),
-                          if (expandedState[index] == true &&
-                              rent.status == 'RENTED' || rent.status == 'LATE' && role == EnumRole.ADMIN.name)
+                          if (expandedState[index] == true && (rent.status == 'RENTED' || rent.status == 'LATE') && role == EnumRole.ADMIN.name)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 16.0),

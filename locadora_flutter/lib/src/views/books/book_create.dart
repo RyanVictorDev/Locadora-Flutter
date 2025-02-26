@@ -140,6 +140,9 @@ class _BookCreateState extends State<BookCreate> {
                   labelText: 'Autor',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Por favor, insira o autor'
+                    : null,
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -161,6 +164,9 @@ class _BookCreateState extends State<BookCreate> {
                   border: OutlineInputBorder(),
                 ),
                 keyboardType: TextInputType.number,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Por favor, insira o estoque'
+                    : null,
               ),
               const SizedBox(height: 16),
               DropdownSearch<PublisherModel>(

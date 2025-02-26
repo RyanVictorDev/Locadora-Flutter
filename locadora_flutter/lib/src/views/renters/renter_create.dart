@@ -158,6 +158,12 @@ class _RenterCreateState extends State<RenterCreate> {
                   labelText: 'Endereço',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o endereço';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               TextFormField(
@@ -166,6 +172,12 @@ class _RenterCreateState extends State<RenterCreate> {
                   labelText: 'CPF',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Por favor, insira o cpf';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
               SizedBox(

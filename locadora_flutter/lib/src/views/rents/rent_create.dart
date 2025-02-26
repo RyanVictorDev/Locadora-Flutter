@@ -29,13 +29,13 @@ class _RentCreateState extends State<RentCreate> {
   BookModel? _selectedBook;
 
   Future<void> _submitForm() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    _showLoadingDialog();
-
     if (_formKey.currentState!.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _showLoadingDialog();
+      
       final rawLaunchDate = _deadLineController.text;
       final renterId = _selectedRenter?.id;
       final bookId = _selectedBook?.id;
@@ -96,7 +96,7 @@ class _RentCreateState extends State<RentCreate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Criando aluguel..."),
             ],
           ),
         );

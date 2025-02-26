@@ -3,9 +3,9 @@ import 'package:locadora_flutter/src/components/app_title.dart';
 import 'package:locadora_flutter/src/enum/enum_role.dart';
 import 'package:locadora_flutter/src/models/user_model.dart';
 import 'package:locadora_flutter/src/services/user_service.dart';
-import 'package:locadora_flutter/src/views/user/user_create.dart';
-import 'package:locadora_flutter/src/views/user/user_details.dart';
-import 'package:locadora_flutter/src/views/user/user_update.dart';
+import 'package:locadora_flutter/src/views/users/user_create.dart';
+import 'package:locadora_flutter/src/views/users/user_details.dart';
+import 'package:locadora_flutter/src/views/users/user_update.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserFlutter extends StatefulWidget {
