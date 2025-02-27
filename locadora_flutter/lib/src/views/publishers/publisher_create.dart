@@ -74,7 +74,7 @@ class _PublisherCreateState extends State<PublisherCreate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Criando editora..."),
             ],
           ),
         );

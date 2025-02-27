@@ -33,7 +33,7 @@ class _UserDetailsState extends State<UserDetails> {
           _user = user;
           _nameController.text = user.name;
           _emailController.text = user.email;
-          _roleController.text = user.role.toString();
+          _roleController.text = _translateRole(user.role.toString());
           _isLoading = false;
         });
       }
@@ -87,5 +87,16 @@ class _UserDetailsState extends State<UserDetails> {
         ),
       ),
     );
+  }
+
+  String _translateRole(String role) {
+    switch (role) {
+      case 'ADMIN':
+        return 'Editor';
+      case 'USER':
+        return 'Leitor';
+      default:
+        return role;
+    }
   }
 }

@@ -113,7 +113,7 @@ class _UserFlutterState extends State<UserFlutter> {
                           ListTile(
                             title: Text(user.name,
                                 style: TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Text(user.role.toString()),
+                            subtitle: Text(_translateRole(user.role.toString())),
                             trailing: Icon(expandedState[index] == true
                                 ? Icons.expand_less
                                 : Icons.expand_more),
@@ -192,5 +192,16 @@ class _UserFlutterState extends State<UserFlutter> {
         ),
       ),
     );
+  }
+
+  String _translateRole(String role) {
+    switch (role) {
+      case 'ADMIN':
+        return 'Editor';
+      case 'USER':
+        return 'Leitor';
+      default:
+        return role;
+    }
   }
 }

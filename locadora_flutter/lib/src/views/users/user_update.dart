@@ -151,7 +151,7 @@ class _UserUpdateState extends State<UserUpdate> {
                     Column(
                       children: [
                         RadioListTile<String>(
-                          title: const Text('Admin'),
+                          title: const Text('Editor'),
                           value: 'ADMIN',
                           groupValue: _selectedRole,
                           onChanged: (value) {
@@ -161,7 +161,7 @@ class _UserUpdateState extends State<UserUpdate> {
                           },
                         ),
                         RadioListTile<String>(
-                          title: const Text('Usuário'),
+                          title: const Text('Leitor'),
                           value: 'USER',
                           groupValue: _selectedRole,
                           onChanged: (value) {

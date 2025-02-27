@@ -77,7 +77,7 @@ class _RenterCreateState extends State<RenterCreate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Criando locatário..."),
             ],
           ),
         );

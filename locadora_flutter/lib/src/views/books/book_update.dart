@@ -119,7 +119,7 @@ class _BookUpdateState extends State<BookUpdate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Editando livro..."),
             ],
           ),
         );

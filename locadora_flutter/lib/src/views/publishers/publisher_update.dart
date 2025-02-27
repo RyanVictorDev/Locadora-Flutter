@@ -104,7 +104,7 @@ class _PublisherUpdateState extends State<PublisherUpdate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Editando editora..."),
             ],
           ),
         );

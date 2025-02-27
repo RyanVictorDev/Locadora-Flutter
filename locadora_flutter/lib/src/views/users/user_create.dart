@@ -160,7 +160,7 @@ Future<void> _submitForm() async {
                     },
                   ),
                   RadioListTile(
-                    title: const Text('Usuário'),
+                    title: const Text('Leitor'),
                     value: 'USER',
                     groupValue: _selectedRole,
                     onChanged: (value) {

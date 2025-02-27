@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:locadora_flutter/src/components/app_title.dart';
+import 'package:locadora_flutter/src/components/bar_chart.dart';
+import 'package:locadora_flutter/src/components/pie_chart.dart';
 import 'package:locadora_flutter/src/models/more_rented_book_model.dart';
 import 'package:locadora_flutter/src/models/rents_per_renters_model.dart';
 import 'package:locadora_flutter/src/services/dashboard_service.dart';
@@ -81,59 +83,7 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
                   ),
                   SizedBox(height: 20),
                   Expanded(
-                    child: BarChart(
-                      BarChartData(
-                        barGroups: [
-                          BarChartGroupData(x: 0, barRods: [
-                            BarChartRodData(
-                                toY: data[0].toDouble(), color: Colors.blue)
-                          ]),
-                          BarChartGroupData(x: 1, barRods: [
-                            BarChartRodData(
-                                toY: data[1].toDouble(), color: Colors.red)
-                          ]),
-                          BarChartGroupData(x: 2, barRods: [
-                            BarChartRodData(
-                                toY: data[2].toDouble(), color: Colors.green)
-                          ]),
-                          BarChartGroupData(x: 3, barRods: [
-                            BarChartRodData(
-                                toY: data[3].toDouble(), color: Colors.orange)
-                          ]),
-                        ],
-                        titlesData: FlTitlesData(
-                          leftTitles: AxisTitles(
-                            sideTitles: SideTitles(showTitles: true),
-                          ),
-                          bottomTitles: AxisTitles(
-                            sideTitles: SideTitles(
-                              showTitles: true,
-                              getTitlesWidget: (value, meta) {
-                                List<String> labels = [
-                                  "Total de Aluguéis",
-                                  "Atrasados",
-                                  "No Prazo",
-                                  "Com Atraso"
-                                ];
-
-                                return SideTitleWidget(
-                                  space: 10,
-                                  meta: meta,
-                                  child: Text(
-                                    labels[value.toInt()],
-                                    style: TextStyle(fontSize: 12),
-                                    textAlign: TextAlign.center,
-                                  ),
-                                );
-                              },
-                              reservedSize:
-                                  60,
-                            ),
-                          ),
-                        ),
-                        borderData: FlBorderData(show: false),
-                      ),
-                    ),
+                    child: BarChartWidget(data: data)
                   ),
                   SizedBox(height: 20),
                   Text(
@@ -155,29 +105,13 @@ class _DashboardFlutterState extends State<DashboardFlutter> {
                           );
                         } else {
                           List<MoreRentedBookModel> booksData = snapshot.data!;
-                          int total = booksData.fold(
-                              0, (sum, book) => sum + book.totalRents);
-                          return PieChart(
-                            PieChartData(
-                              sections: booksData.map((book) {
-                                return PieChartSectionData(
-                                  value: (book.totalRents / total) * 100,
-                                  title: "${book.name}: ${book.totalRents}", titleStyle: TextStyle(fontWeight: FontWeight.bold),
-                                  radius: 50,
-                                  color: Colors.accents[
-                                      booksData.indexOf(book) %
-                                          Colors.primaries.length],
-                                );
-                              }).toList(),
-                              sectionsSpace: 2,
-                              centerSpaceRadius: 40,
-                            ),
-                          );
+                          int total = booksData.fold(0, (sum, book) => sum + book.totalRents);
+                          return PieChartWidget(booksData: booksData, total: total,);
                         }
                       },
                     ),
                   ),
-                                  SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Expanded(
                     child: FutureBuilder<List<RentsPerRentersModel>>(
                       future: rentsPerRentersFuture,

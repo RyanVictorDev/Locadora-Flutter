@@ -122,7 +122,7 @@ class _RentUpdateState extends State<RentUpdate> {
             children: const [
               CircularProgressIndicator(),
               SizedBox(width: 16),
-              Text("Criando usuário..."),
+              Text("Editando aluguel..."),
             ],
           ),
         );
